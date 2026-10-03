@@ -1,0 +1,25 @@
+# Fundamental
+# numpy
+# jax[cuda12]==0.4.27  # See document for installation
+optax==0.2.4
+dm-haiku==0.0.13
+numpyro
+numba
+tensorboardX
+ipdb
+
+# Used by environment
+gymnasium[mujoco]==1.0.0
+dill==0.3.8
+# free-mujoco-py
+matplotlib
+scikit-learn
+
+# Data (D4RL offline datasets)
+h5py
+
+# Utility
+tqdm
+setproctitle
+pyyaml
+wandb
