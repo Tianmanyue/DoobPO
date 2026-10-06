@@ -156,10 +156,19 @@ body {
   border-radius: 5px;
 }
 
-/* LFGPO results */
+/* Results */
 .results-figure { margin: 1.5rem 0; text-align: center; }
 .results-figure img { width: 100%; height: auto; }
 .results-figure figcaption { font-size: 0.9rem; color: #555; margin-top: 0.5rem; text-align: justify; }
 .results-table { font-size: 0.8rem; white-space: nowrap; margin: 0 auto; }
 .results-table .std { color: #888; font-size: 0.85em; }
 .results-table tr.is-ours td:first-child { font-weight: 600; }
+
+/* Replace the old method names baked into the plot images. */
+.results-plot-crop { width: 100%; overflow: hidden; }
+.results-plot-crop.diffusion-plot { aspect-ratio: 3747 / 1468; }
+.results-plot-crop.flow-plot { aspect-ratio: 3727 / 1468; }
+.results-plot-crop img { display: block; width: 100%; height: auto; }
+.plot-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.3rem 1rem; margin: 0.5rem 0; font-size: 0.8rem; }
+.plot-legend span { display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
+.legend-swatch { display: inline-block; width: 20px; height: 3px; background: var(--legend-color); }

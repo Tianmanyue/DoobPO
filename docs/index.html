@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="description"
-        content="LFGPO: reinforcement learning fine-tuning of diffusion and flow policies without evaluating action likelihoods, via a learned ratio and Doob's drift matching.">
-  <meta name="keywords" content="diffusion policy, flow policy, policy optimization, PPO, GRPO, Doob h-transform, reinforcement learning">
+        content="DoobPO brings PPO, GRPO, and other policy updates to diffusion and flow policies without exact action likelihoods, using Doob's h-transform and conditional drift matching.">
+  <meta name="keywords" content="DoobPO, Doob h-transform, diffusion policy, flow policy, PPO, GRPO, reinforcement learning, conditional drift matching">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Likelihood-Free Generative Policy Optimization</title>
+  <meta property="og:title" content="Doob-Based Generative Policy Optimization">
+  <meta property="og:description" content="A unified framework for likelihood-free diffusion and flow policy optimization.">
+  <title>Doob-Based Generative Policy Optimization | DoobPO</title>
 
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
@@ -40,30 +42,28 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">Likelihood-Free Generative Policy Optimization</h1>
+          <h1 class="title is-1 publication-title">Doob-Based Generative Policy Optimization</h1>
           <div class="is-size-5 publication-authors">
-            <!-- TODO: add author homepage links and equal-contribution / corresponding markers -->
-            <span class="author-block">Maojiang Su<sup>1</sup>,</span>
-            <span class="author-block">Qijie Zhu<sup>1</sup>,</span>
-            <span class="author-block">Shuyang Yu<sup>1</sup>,</span>
-            <span class="author-block">Yu Xiao<sup>1</sup>,</span>
-            <span class="author-block">Minshuo Chen<sup>1</sup>,</span>
-            <span class="author-block">Zhaoran Wang<sup>1</sup>,</span>
-            <span class="author-block">Han Liu<sup>1</sup></span>
+            <span class="author-block">Maojiang Su,</span>
+            <span class="author-block">Qijie Zhu,</span>
+            <span class="author-block">Yu Xiao,</span>
+            <span class="author-block">Shuyang Yu,</span>
+            <span class="author-block">Minshuo Chen,</span>
+            <span class="author-block">Zhaoran Wang,</span>
+            <span class="author-block">Han Liu</span>
           </div>
 
           <div class="is-size-5 publication-authors">
-            <!-- TODO: confirm affiliations with the first author -->
-            <span class="author-block"><sup>1</sup>Northwestern University</span>
+            <span class="author-block">Northwestern University</span>
           </div>
 
           <div class="is-size-5 publication-authors">
-            <span class="author-block">NeurIPS 2026</span>
+            <span class="author-block">NeurIPS 2026 manuscript</span>
           </div>
 
           <div class="column has-text-centered">
             <div class="publication-links">
-              <!-- TODO: enable Paper / arXiv once the camera-ready PDF is public (remove the disabled style). -->
+              <!-- Enable Paper / arXiv when public links are available. -->
               <span class="link-block">
                 <a href="#" style="pointer-events: none; opacity: 0.5;"
                    class="external-link button is-normal is-rounded is-dark">
@@ -104,11 +104,10 @@
 <section class="hero teaser">
   <div class="container is-max-desktop">
     <div class="hero-body">
-      <!-- TODO (optional): teaser figure goes here, above the TL;DR. -->
       <h2 class="subtitle has-text-centered">
-        <strong>TL;DR:</strong> LFGPO lets PPO and GRPO fine-tune diffusion and flow policies
-        without ever evaluating an action likelihood: learn the likelihood ratio with a small
-        network, then distill it into the policy with Doob's drift matching.
+        <strong>TL;DR:</strong> DoobPO brings PPO, GRPO, and other update rules to diffusion and flow
+        policies without exact action likelihoods. Each rule defines a target policy tilt; Doob's
+        <em>h</em>-transform characterizes how to realize it, and conditional drift matching makes it trainable.
       </h2>
     </div>
   </div>
@@ -125,23 +124,18 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Diffusion and flow policies have become promising tools for robotic and sequential
-            decision-making systems. Many stable and effective policy optimization methods
-            require evaluating the likelihood or likelihood ratio of an action under the current
-            policy. However, these quantities are generally intractable for diffusion and flow
-            models, which prevents widely used policy update algorithms from being applied to
-            generative policies. We propose Likelihood-Free Generative Policy Optimization
-            (LFGPO), a framework that avoids exact likelihood evaluation by separating policy
-            improvement from generative model training. In the first stage, LFGPO uses a
-            lightweight neural network to represent the likelihood ratio that carries the policy
-            improvement signal. In the second stage, it distills the ratio into diffusion or flow
-            policies through a weighted score- or velocity-matching objective. Our framework
-            incorporates a large family of Reinforcement Learning (RL) algorithms, including
-            PPO and GRPO, to be applied to diffusion and flow policy optimization. We show that
-            the solution to the weighted score matching objective solves a stochastic optimal
-            control problem. Across MuJoCo continuous-control benchmarks, LFGPO delivers strong
-            and stable improvements over competitive diffusion- and flow-policy baselines,
-            showing a practical route to RL fine-tuning for generative policies.
+            Diffusion and flow policies are expressive but generally lack tractable action
+            likelihoods, limiting the direct use of PPO, GRPO, and related updates. We introduce
+            Doob Policy Optimization (DoobPO), a unified framework that separates policy
+            improvement from generative policy learning. An update rule specifies a ratio-tilted
+            target distribution: analytic ratios are used directly, while PPO and GRPO learn a
+            lightweight ratio model. Doob's <em>h</em>-transform characterizes the corresponding
+            diffusion path, and a conditional drift matching objective trains diffusion or flow
+            policies from behavior-policy samples. We prove gradient equivalence between the
+            conditional and ideal objectives for both policy classes. For diffusion, the resulting
+            Doob process is the minimum-control-energy modification that realizes the tilted
+            endpoint under the paper's assumptions. DoobPO performs strongly on MuJoCo
+            continuous-control benchmarks.
           </p>
         </div>
       </div>
@@ -157,121 +151,134 @@
       <div class="column is-four-fifths">
         <h2 class="title is-3 has-text-centered">Method</h2>
 
-        <!-- Problem. -->
-        <h3 class="title is-4">The problem: no likelihood, no PPO</h3>
+        <h3 class="title is-4">The challenge: policy updates need action ratios</h3>
         <div class="content has-text-justified">
           <p>
-            Trust-region methods such as PPO and GRPO update a policy through the ratio
-            \(r_\theta(o,a)=\pi_\theta(a\mid o)/\pi_{\text{old}}(a\mid o)\).
-            A diffusion or flow policy produces an action only after simulating a whole denoising
-            or flow trajectory, so \(\pi_\theta(a\mid o)\) has no cheap closed form
-            and this ratio cannot be computed.
-          </p>
-          <p>
-            <strong>Our idea:</strong> stop asking the generative model for a likelihood.
-            Separate <em>learning the policy improvement signal</em> from
-            <em>distilling it into the generative policy</em>.
+            PPO and GRPO use the action ratio
+            \(r_\theta(o,a)=\pi_\theta(a\mid o)/\pi_{\mathrm{old}}(a\mid o)\).
+            A diffusion or flow policy generates an action through a trajectory, so its exact
+            action likelihood is generally intractable. DoobPO separates the update rule from
+            the generative model: first specify the desired change in the action distribution,
+            then learn a generative process that realizes it.
           </p>
         </div>
 
-        <!-- Stage 1. -->
-        <h3 class="title is-4">Stage 1: learn the ratio</h3>
+        <h3 class="title is-4">1. An update rule defines a policy tilt</h3>
         <div class="content has-text-justified">
           <p>
-            We train a lightweight network \(r_\beta(o,a)\) to play the role of the intractable
-            ratio. It is optimized with an ordinary RL objective, for example the clipped PPO
-            objective with \(r_\theta\) replaced by \(r_\beta\). Intuitively,
-            \(r_\beta>1\) up-weights an action relative to the behavior policy and
-            \(r_\beta<1\) down-weights it. A small regularizer keeps
-            \(\mathbb{E}_{a\sim\pi_{\text{old}}}[r_\beta]=1\), as a true ratio would.
-            This stage does not depend on the type of generative policy, so PPO, GRPO,
-            policy mirror descent, and soft actor-critic all fit.
-          </p>
-        </div>
-
-        <!-- Stage 2. -->
-        <h3 class="title is-4">Stage 2: distill the ratio with Doob's drift matching</h3>
-        <div class="content has-text-justified">
-          <p>
-            The target is the ratio-tilted policy
-            \(\pi(a\mid o)\propto r_\beta(o,a)\,\pi_{\text{old}}(a\mid o)\).
-            Doob's \(h\)-transform says that this tilt is realized by adding one drift term to the
-            denoising dynamics:
+            Different RL updates express different preferences over actions. A KL-proximal
+            policy mirror descent update has an analytic target ratio proportional to
+            \(\exp(\widehat A(o,a)/\lambda)\). PPO and GRPO do not generally yield a
+            closed-form target ratio, so DoobPO learns a lightweight positive ratio model
+            \(r_\beta(o,a)\) with their respective RL objectives. A regularizer encourages
+            \(\mathbb{E}_{a\sim\pi_{\mathrm{old}}(\cdot\mid o)}[r_\beta(o,a)]=1\).
           </p>
         </div>
         <div class="box">
           <p class="has-text-centered">
             \[
-              \mathrm{d}X_t=\Big[f(X_t,t)-\sigma_t^2 s_\phi(X_t,t,o)\;{\color{#3273dc}-\;\sigma_t^2\nabla_x\log h_t(X_t,o)}\Big]\mathrm{d}t+\sigma_t\mathrm{d}W_t,
-              \qquad h_0=r_\beta .
+              \begin{aligned}
+              \pi_{\mathrm{target}}(a\mid o)
+              &=\frac{r(o,a)\,\pi_{\mathrm{old}}(a\mid o)}{Z(o)},\\
+              &\propto e^{-E(o,a)}\pi_{\mathrm{old}}(a\mid o),\\
+              E(o,a)&=-\log r(o,a).
+              \end{aligned}
             \]
           </p>
           <p class="has-text-centered is-size-7">
-            Lemma 3.1 (Doob's \(h\)-transform). The blue term is the only change to the pretrained
-            reverse process.
+            \(Z(o)=\mathbb E_{a\sim\pi_{\mathrm{old}}(\cdot\mid o)}[r(o,a)]\) normalizes the tilt;
+            the update rule sets its action-dependent energy.
           </p>
         </div>
+
+        <h3 class="title is-4">2. Doob turns the endpoint tilt into a generative path</h3>
         <div class="content has-text-justified">
           <p>
-            Learning that extra drift directly would need samples from the tilted distribution,
-            which we do not have. We therefore use a <strong>conditional drift matching</strong>
-            loss, which simply re-weights the usual denoising regression target by the learned
-            ratio:
+            For diffusion policies, Doob's <em>h</em>-transform propagates the endpoint
+            preference through the pretrained denoising process. The resulting process has
+            the ratio-tilted action distribution as its endpoint (Lemma 3.1). For flow
+            policies, terminal reweighting likewise defines a tilted path.
           </p>
         </div>
         <div class="box">
           <p class="has-text-centered">
             \[
-              \mathcal{L}_{\mathrm{CDM}}(\theta)=
-              \mathbb{E}\Big[\,r_\beta(o,X_0)\,\big\|\nabla_x\log p^{\phi}_{0|t}(X_t\mid X_0,o)-s_\theta(X_t,t,o)\big\|_2^2\Big].
+              \begin{aligned}
+              h_t(x,o)&=\mathbb{E}\!\left[r(o,X_0)\mid X_t=x,o\right],\\
+              \Delta b_t(x,o)&=-\sigma_t^2\nabla_x\log h_t(x,o).
+              \end{aligned}
             \]
           </p>
           <p class="has-text-centered is-size-7">
-            Theorems 3.1 and 3.2: this tractable loss has the same gradient direction as the ideal
-            drift matching objective, for both diffusion and flow policies.
-          </p>
-        </div>
-        <div class="content has-text-justified">
-          <p>
-            In other words, Stage 2 is ordinary score matching (or flow matching) in which each
-            action is weighted by how much the ratio model likes it. No likelihood is evaluated
-            anywhere.
+            \(\Delta b_t\) is the extra diffusion drift. \(X_0\) is the action endpoint and \(X_T\) the noise endpoint in the
+            paper's diffusion time convention.
           </p>
         </div>
 
-        <!-- Why it works. -->
-        <h3 class="title is-4">Why it works: the smallest possible change to the policy</h3>
+        <h3 class="title is-4">3. Conditional drift matching makes it trainable</h3>
         <div class="content has-text-justified">
           <p>
-            Among all controlled reverse diffusions that reach the tilted action distribution,
-            drift matching picks the one with <strong>minimum control energy</strong>
-            (Proposition 3.1):
+            The ideal tilted path is unavailable for direct training. DoobPO instead
+            weights conditional score or velocity regression by the endpoint ratio,
+            using samples from the old policy:
           </p>
         </div>
         <div class="box">
           <p class="has-text-centered">
             \[
-              \inf_{u}\;\tfrac12\,\mathbb{E}\!\int_0^T\|\sigma_t u_t(Y_t,o)\|_2^2\,\mathrm{d}t
-              \quad\text{s.t. the endpoint law of } Y \text{ is the tilted policy.}
+              \mathcal L_{\mathrm{CDM}}(\theta)
+              =\mathbb E_{\mathrm{old}}
+              \!\left[r(o,a)\,\|\psi_\theta-\psi_{\mathrm{cond}}\|_2^2\right].
+            \]
+          </p>
+          <p class="has-text-centered is-size-7">
+            \(\psi_\theta=\psi_\theta(x_t,t,o)\); \(\psi_{\mathrm{cond}}=\psi_{\mathrm{cond}}(x_t,t,o,a)\)
+            is a conditional score target for diffusion or a velocity target for flow.
+          </p>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            At each fixed observation, the conditional objective's gradient is a positive
+            multiple of the ideal drift-matching gradient for both diffusion and flow
+            (Theorems 3.1 and 3.2). The implementation uses the Gaussian diffusion or
+            affine flow regression targets described in the paper.
+          </p>
+        </div>
+
+        <h3 class="title is-4">Why it works: a minimum-energy diffusion update</h3>
+        <div class="content has-text-justified">
+          <p>
+            Among controlled reverse diffusions with the specified noise and action
+            marginals, the Doob-transformed process minimizes quadratic control energy:
+          </p>
+        </div>
+        <div class="box">
+          <p class="has-text-centered">
+            \[
+              \begin{aligned}
+              \inf_u\quad &\frac{1}{2}\,
+              \mathbb E_{Q^u}\!\int_0^T
+              \|\sigma_t u_t(Y_t,o)\|_2^2\,\mathrm dt,\\
+              &Y_T\sim p_T^h,\quad Y_0\sim p_0^h.
+              \end{aligned}
             \]
           </p>
         </div>
         <div class="content has-text-justified">
           <p>
-            So LFGPO modifies the pretrained diffusion process as little as possible while
-            realizing the desired policy improvement. This gives a theoretical explanation for
-            its stability and efficiency.
+            Proposition 3.1 is stated for each observation and assumes a realizable model
+            class and an attained minimum. This optimal-control guarantee concerns
+            diffusion; the flow result establishes gradient equivalence.
           </p>
         </div>
 
-        <!-- Unified view. -->
-        <h3 class="title is-4">One framework, many algorithms</h3>
+        <h3 class="title is-4">One framework, several update rules</h3>
         <div class="content has-text-justified">
           <p>
-            Two design choices span the family: the generative policy class and the policy update
-            rule. When the update has a closed-form target ratio, Stage 1 is unnecessary and
-            LFGPO reduces to a single re-weighted drift matching step. For PPO and GRPO the
-            ratio is learned.
+            The generative policy can be diffusion or flow, while the update rule determines
+            the tilt. Analytic ratios lead directly to weighted matching; PPO and GRPO use
+            learned ratios. This view includes existing methods as special cases and yields
+            DoobPPO, DoobGRPO, and DoobPMD.
           </p>
         </div>
         <table class="table is-fullwidth is-striped is-hoverable">
@@ -279,11 +286,11 @@
             <tr><th>Method</th><th>Generative policy</th><th>Policy update</th><th>Ratio</th></tr>
           </thead>
           <tbody>
-            <tr><td>DPMD</td><td>Diffusion</td><td>Policy Mirror Descent (KL-proximal)</td><td>Analytic</td></tr>
-            <tr><td>SDAC</td><td>Diffusion</td><td>Soft Actor-Critic</td><td>Analytic</td></tr>
-            <tr><td>LFGPO-PMD (ours)</td><td>Flow</td><td>Policy Mirror Descent (KL-proximal)</td><td>Analytic</td></tr>
-            <tr><td>LFGPO-PPO (ours)</td><td>Diffusion / Flow</td><td>Proximal Policy Optimization</td><td>Learned</td></tr>
-            <tr><td>LFGPO-GRPO (ours)</td><td>Diffusion / Flow</td><td>Group Relative Policy Optimization</td><td>Learned</td></tr>
+            <tr><td>DPMD</td><td>Diffusion</td><td>Policy mirror descent</td><td>Analytic</td></tr>
+            <tr><td>SDAC</td><td>Diffusion</td><td>Soft actor-critic</td><td>Analytic</td></tr>
+            <tr><td>DoobPMD (ours)</td><td>Flow</td><td>Policy mirror descent</td><td>Analytic</td></tr>
+            <tr><td>DoobPPO (ours)</td><td>Diffusion / Flow</td><td>PPO</td><td>Learned</td></tr>
+            <tr><td>DoobGRPO (ours)</td><td>Diffusion / Flow</td><td>GRPO</td><td>Learned</td></tr>
           </tbody>
         </table>
       </div>
@@ -291,13 +298,12 @@
   </div>
 </section>
 
-
 <section class="section" id="results">
   <div class="container is-max-widescreen">
     <h2 class="title is-3 has-text-centered">Experiments</h2>
     <div class="content has-text-justified">
       <p>
-        We evaluate LFGPO on 10 OpenAI Gym MuJoCo continuous-control tasks covering locomotion,
+        We evaluate DoobPO on 10 OpenAI Gym MuJoCo continuous-control tasks covering locomotion,
         manipulation, and stabilization. Diffusion policies are trained from scratch for 4M
         environment steps and flow policies for 5M steps, with the same interaction budget for
         every method within a setting. All numbers are mean &plusmn; std over 3 random seeds.
@@ -308,21 +314,29 @@
     <h3 class="title is-4">Diffusion policies</h3>
     <div class="content has-text-justified">
       <p>
-        LFGPO-PPO obtains the best results on HalfCheetah, Humanoid, Ant, Hopper, Swimmer, and
-        Walker2d, while LFGPO-GRPO performs best on Reacher, Pusher, and Inverted2Pendulum.
-        For example, LFGPO-PPO improves over DIPO by 22.6% on HalfCheetah, 20.9% on Humanoid,
+        DoobPPO obtains the best results on HalfCheetah, Humanoid, Ant, Hopper, Swimmer, and
+        Walker2d, while DoobGRPO performs best on Reacher, Pusher, and Inverted2Pendulum.
+        For example, DoobPPO improves over DIPO by 22.6% on HalfCheetah, 20.9% on Humanoid,
         175.2% on Ant, and 12.2% on Walker2d.
       </p>
     </div>
     <figure class="results-figure">
-      <a href="./static/images/results_diffusion.png" target="_blank" rel="noopener">
+      <div class="results-plot-crop diffusion-plot">
         <img src="./static/images/results_diffusion.png"
              alt="Learning curves of diffusion-policy methods on 10 MuJoCo tasks."/>
-      </a>
+      </div>
+      <div class="plot-legend" aria-label="Diffusion plot legend">
+        <span><i class="legend-swatch" style="--legend-color:#f5a623"></i>DPPO</span>
+        <span><i class="legend-swatch" style="--legend-color:#2b7c35"></i>SDAC</span>
+        <span><i class="legend-swatch" style="--legend-color:#666666"></i>DIPO</span>
+        <span><i class="legend-swatch" style="--legend-color:#5631a8"></i>DPMD</span>
+        <span><i class="legend-swatch" style="--legend-color:#1467be"></i>DoobPPO (ours)</span>
+        <span><i class="legend-swatch" style="--legend-color:#e73c38"></i>DoobGRPO (ours)</span>
+      </div>
       <figcaption>
         Learning curves on 10 MuJoCo tasks, evaluated every 200k environment steps. Curves show
         the mean undiscounted return over 3 training seeds; shaded regions show one standard
-        deviation. Click to enlarge.
+        deviation.
       </figcaption>
     </figure>
     <p class="has-text-centered is-size-6"><strong>Table 1.</strong> Diffusion policy performance
@@ -336,8 +350,8 @@
 <tr><td>DPMD</td><td>12612 <span class="std">± 932</span></td><td>-2.97 <span class="std">± 1.34</span></td><td>5138 <span class="std">± 191</span></td><td>-28.22 <span class="std">± 6.06</span></td><td><strong>1000 <span class="std">± 0</span></strong></td><td><u>6358 <span class="std">± 276</span></u></td><td><u>3608 <span class="std">± 73</span></u></td><td>51.1 <span class="std">± 1.4</span></td><td>5381 <span class="std">± 26</span></td><td>9355 <span class="std">± 3.7</span></td></tr>
 <tr><td>DACER</td><td>11203 <span class="std">± 246</span></td><td>-3.31 <span class="std">± 0.07</span></td><td>2755 <span class="std">± 3599</span></td><td>-30.82 <span class="std">± 0.13</span></td><td>801 <span class="std">± 446</span></td><td>4301 <span class="std">± 524</span></td><td>3212 <span class="std">± 86</span></td><td>103.0 <span class="std">± 45.8</span></td><td>3194 <span class="std">± 1822</span></td><td>6289 <span class="std">± 3977</span></td></tr>
 <tr><td>SDAC</td><td><u>14731 <span class="std">± 166</span></u></td><td>-5.83 <span class="std">± 1.36</span></td><td>6173 <span class="std">± 1592</span></td><td>-108 <span class="std">± 5.23</span></td><td><strong>1000 <span class="std">± 0</span></strong></td><td>1880 <span class="std">± 1025</span></td><td>3384 <span class="std">± 303</span></td><td><u>154 <span class="std">± 5.1</span></u></td><td>5181 <span class="std">± 986</span></td><td>9353 <span class="std">± 0.3</span></td></tr>
-<tr class="is-ours"><td>LFGPO-PPO (ours)</td><td><strong>14921 <span class="std">± 39</span></strong></td><td><u>-2.96 <span class="std">± 0.02</span></u></td><td><strong>6679 <span class="std">± 63</span></strong></td><td><u>-23.67 <span class="std">± 3.16</span></u></td><td><strong>1000 <span class="std">± 0</span></strong></td><td><strong>6738 <span class="std">± 53</span></strong></td><td><strong>3681 <span class="std">± 269</span></strong></td><td><strong>161 <span class="std">± 0.7</span></strong></td><td><strong>5642 <span class="std">± 13</span></strong></td><td><u>9356 <span class="std">± 3</span></u></td></tr>
-<tr class="is-ours"><td>LFGPO-GRPO (ours)</td><td>7800 <span class="std">± 271</span></td><td><strong>-2.95 <span class="std">± 1.35</span></strong></td><td><u>6634 <span class="std">± 1517</span></u></td><td><strong>-23.62 <span class="std">± 4.35</span></strong></td><td><strong>1000 <span class="std">± 0</span></strong></td><td>3278 <span class="std">± 40</span></td><td>251 <span class="std">± 1.4</span></td><td>142 <span class="std">± 2.4</span></td><td><u>5636 <span class="std">± 10</span></u></td><td><strong>9360 <span class="std">± 0</span></strong></td></tr>
+<tr class="is-ours"><td>DoobPPO (ours)</td><td><strong>14921 <span class="std">± 39</span></strong></td><td><u>-2.96 <span class="std">± 0.02</span></u></td><td><strong>6679 <span class="std">± 63</span></strong></td><td><u>-23.67 <span class="std">± 3.16</span></u></td><td><strong>1000 <span class="std">± 0</span></strong></td><td><strong>6738 <span class="std">± 53</span></strong></td><td><strong>3681 <span class="std">± 269</span></strong></td><td><strong>161 <span class="std">± 0.7</span></strong></td><td><strong>5642 <span class="std">± 13</span></strong></td><td><u>9356 <span class="std">± 3</span></u></td></tr>
+<tr class="is-ours"><td>DoobGRPO (ours)</td><td>7800 <span class="std">± 271</span></td><td><strong>-2.95 <span class="std">± 1.35</span></strong></td><td><u>6634 <span class="std">± 1517</span></u></td><td><strong>-23.62 <span class="std">± 4.35</span></strong></td><td><strong>1000 <span class="std">± 0</span></strong></td><td>3278 <span class="std">± 40</span></td><td>251 <span class="std">± 1.4</span></td><td>142 <span class="std">± 2.4</span></td><td><u>5636 <span class="std">± 10</span></u></td><td><strong>9360 <span class="std">± 0</span></strong></td></tr>
 </tbody>
 </table>
 </div>
@@ -346,21 +360,29 @@
     <h3 class="title is-4" style="margin-top: 2.5rem;">Flow policies</h3>
     <div class="content has-text-justified">
       <p>
-        LFGPO-GRPO achieves the best result on 9 out of 10 tasks under the same 5M-step budget.
+        DoobGRPO achieves the best result on 9 out of 10 tasks under the same 5M-step budget.
         It improves over the strongest baseline ReinFlow by 373.8% on HalfCheetah, 71.7% on
-        Hopper, 213.7% on Swimmer, and 738.0% on Walker2d. LFGPO-PMD is a strong second-best on
+        Hopper, 213.7% on Swimmer, and 738.0% on Walker2d. DoobPMD is a strong second-best on
         several tasks, showing that the framework works across different policy-gradient methods.
       </p>
     </div>
     <figure class="results-figure">
-      <a href="./static/images/results_flow.png" target="_blank" rel="noopener">
+      <div class="results-plot-crop flow-plot">
         <img src="./static/images/results_flow.png"
              alt="Learning curves of flow-policy methods on 10 MuJoCo tasks."/>
-      </a>
+      </div>
+      <div class="plot-legend" aria-label="Flow plot legend">
+        <span><i class="legend-swatch" style="--legend-color:#f5a623"></i>FPO</span>
+        <span><i class="legend-swatch" style="--legend-color:#2b7c35"></i>ReinFlow</span>
+        <span><i class="legend-swatch" style="--legend-color:#666666"></i>Flow-SDE</span>
+        <span><i class="legend-swatch" style="--legend-color:#5631a8"></i>DoobPMD (ours)</span>
+        <span><i class="legend-swatch" style="--legend-color:#1467be"></i>DoobPPO (ours)</span>
+        <span><i class="legend-swatch" style="--legend-color:#e73c38"></i>DoobGRPO (ours)</span>
+      </div>
       <figcaption>
         Learning curves on 10 MuJoCo tasks, evaluated every 250k environment steps. Curves show
         the mean undiscounted return over 3 training seeds; shaded regions show one standard
-        deviation. Click to enlarge.
+        deviation.
       </figcaption>
     </figure>
     <p class="has-text-centered is-size-6"><strong>Table 2.</strong> Flow policy performance
@@ -372,9 +394,9 @@
 <tr><td>FPO</td><td>327 <span class="std">± 399</span></td><td>-8.79 <span class="std">± 3.20</span></td><td>390 <span class="std">± 110</span></td><td>-53.77 <span class="std">± 3.69</span></td><td>52 <span class="std">± 24</span></td><td>-13 <span class="std">± 13</span></td><td>137 <span class="std">± 55</span></td><td>35.8 <span class="std">± 2.51</span></td><td>186 <span class="std">± 140</span></td><td>314 <span class="std">± 84</span></td></tr>
 <tr><td>ReinFlow</td><td>1344 <span class="std">± 310</span></td><td>-6.30 <span class="std">± 2.83</span></td><td>525 <span class="std">± 92</span></td><td><u>-32.85 <span class="std">± 3.81</span></u></td><td><strong>1000 <span class="std">± 0</span></strong></td><td>-5 <span class="std">± 12</span></td><td><u>1911 <span class="std">± 740</span></u></td><td>42.3 <span class="std">± 1.77</span></td><td>503 <span class="std">± 213</span></td><td><strong>9358 <span class="std">± 1</span></strong></td></tr>
 <tr><td>Flow-SDE</td><td>27 <span class="std">± 219</span></td><td>-31.08 <span class="std">± 3.53</span></td><td>244 <span class="std">± 60</span></td><td>-178.42 <span class="std">± 6.41</span></td><td>413 <span class="std">± 238</span></td><td>-45 <span class="std">± 41</span></td><td>210 <span class="std">± 100</span></td><td>33.9 <span class="std">± 4.44</span></td><td>243 <span class="std">± 128</span></td><td>268 <span class="std">± 68</span></td></tr>
-<tr class="is-ours"><td>LFGPO-PMD (ours)</td><td><u>4810 <span class="std">± 53</span></u></td><td><u>-4.35 <span class="std">± 1.40</span></u></td><td><u>688 <span class="std">± 123</span></u></td><td>-39.10 <span class="std">± 4.08</span></td><td><strong>1000 <span class="std">± 0</span></strong></td><td><u>1614 <span class="std">± 583</span></u></td><td>452 <span class="std">± 4</span></td><td><u>96.9 <span class="std">± 32.13</span></u></td><td><u>726 <span class="std">± 144</span></u></td><td>9348 <span class="std">± 0</span></td></tr>
-<tr class="is-ours"><td>LFGPO-PPO (ours)</td><td>3190 <span class="std">± 60</span></td><td>-6.73 <span class="std">± 2.16</span></td><td>556 <span class="std">± 94</span></td><td>-42.81 <span class="std">± 3.75</span></td><td><strong>1000 <span class="std">± 0</span></strong></td><td>1417 <span class="std">± 203</span></td><td>423 <span class="std">± 10</span></td><td>48.0 <span class="std">± 1.30</span></td><td>440 <span class="std">± 16</span></td><td><u>9350 <span class="std">± 1</span></u></td></tr>
-<tr class="is-ours"><td>LFGPO-GRPO (ours)</td><td><strong>6368 <span class="std">± 51</span></strong></td><td><strong>-3.60 <span class="std">± 1.37</span></strong></td><td><strong>735 <span class="std">± 111</span></strong></td><td><strong>-29.90 <span class="std">± 3.74</span></strong></td><td><strong>1000 <span class="std">± 0</span></strong></td><td><strong>2986 <span class="std">± 56</span></strong></td><td><strong>3282 <span class="std">± 7</span></strong></td><td><strong>132.7 <span class="std">± 2.71</span></strong></td><td><strong>4215 <span class="std">± 13</span></strong></td><td><u>9350 <span class="std">± 1</span></u></td></tr>
+<tr class="is-ours"><td>DoobPMD (ours)</td><td><u>4810 <span class="std">± 53</span></u></td><td><u>-4.35 <span class="std">± 1.40</span></u></td><td><u>688 <span class="std">± 123</span></u></td><td>-39.10 <span class="std">± 4.08</span></td><td><strong>1000 <span class="std">± 0</span></strong></td><td><u>1614 <span class="std">± 583</span></u></td><td>452 <span class="std">± 4</span></td><td><u>96.9 <span class="std">± 32.13</span></u></td><td><u>726 <span class="std">± 144</span></u></td><td>9348 <span class="std">± 0</span></td></tr>
+<tr class="is-ours"><td>DoobPPO (ours)</td><td>3190 <span class="std">± 60</span></td><td>-6.73 <span class="std">± 2.16</span></td><td>556 <span class="std">± 94</span></td><td>-42.81 <span class="std">± 3.75</span></td><td><strong>1000 <span class="std">± 0</span></strong></td><td>1417 <span class="std">± 203</span></td><td>423 <span class="std">± 10</span></td><td>48.0 <span class="std">± 1.30</span></td><td>440 <span class="std">± 16</span></td><td><u>9350 <span class="std">± 1</span></u></td></tr>
+<tr class="is-ours"><td>DoobGRPO (ours)</td><td><strong>6368 <span class="std">± 51</span></strong></td><td><strong>-3.60 <span class="std">± 1.37</span></strong></td><td><strong>735 <span class="std">± 111</span></strong></td><td><strong>-29.90 <span class="std">± 3.74</span></strong></td><td><strong>1000 <span class="std">± 0</span></strong></td><td><strong>2986 <span class="std">± 56</span></strong></td><td><strong>3282 <span class="std">± 7</span></strong></td><td><strong>132.7 <span class="std">± 2.71</span></strong></td><td><strong>4215 <span class="std">± 13</span></strong></td><td><u>9350 <span class="std">± 1</span></u></td></tr>
 </tbody>
 </table>
 </div>
@@ -386,9 +408,9 @@
   <div class="container is-max-desktop content">
     <h2 class="title">BibTeX</h2>
     <!-- TODO: replace with the official entry once the arXiv / proceedings version is public. -->
-    <pre><code>@inproceedings{su2026lfgpo,
-  author    = {Su, Maojiang and Zhu, Qijie and Yu, Shuyang and Xiao, Yu and Chen, Minshuo and Wang, Zhaoran and Liu, Han},
-  title     = {Likelihood-Free Generative Policy Optimization},
+    <pre><code>@inproceedings{su2026doobpo,
+  author    = {Su, Maojiang and Zhu, Qijie and Xiao, Yu and Yu, Shuyang and Chen, Minshuo and Wang, Zhaoran and Liu, Han},
+  title     = {Doob-Based Generative Policy Optimization},
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
   year      = {2026},
 }</code></pre>

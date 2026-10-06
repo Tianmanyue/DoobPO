@@ -1,26 +1,31 @@
-# LFGPO: Likelihood-Free Generative Policy Optimization
+# DoobPO: Doob-Based Generative Policy Optimization
 
-A unified framework for reinforcement-learning fine-tuning of **diffusion**
-and **flow** policies **without evaluating exact action likelihoods**.
+A unified framework for applying policy updates such as **PPO** and **GRPO**
+to **diffusion** and **flow** policies without evaluating exact action
+likelihoods. The repository and project-page URL retain the name `LFGPO`.
 
-LFGPO decouples policy improvement into two stages:
+The update rule chooses where the policy should go. DoobPO represents that
+choice as a positive action ratio `r(s, a)`, which tilts the old policy
+into a target distribution:
 
-1. **Ratio learning.** Train a lightweight ratio network `r_β(s, a)` with a
-   trust-region RL objective (PPO, GRPO, or — when an analytic form is
-   available — policy mirror descent / SAC).
-2. **Doob's Drift Matching.** Distill the policy improvement encoded in
-   `r_β` into the generative policy by minimising a *conditional* drift
-   matching loss, which is gradient-equivalent to the ideal Doob's Drift
-   Matching objective. For diffusion policies, the resulting tilted
-   process is exactly the Doob *h*-transform of the pretrained reverse
-   SDE, and equivalently the Schrödinger Bridge to the target.
+`π_target(a | s) ∝ r(s, a) π_old(a | s)`.
 
-This avoids the intractable likelihoods of generative policies while
-supporting a broad family of policy-update rules. See the paper for the
-full derivation, theoretical guarantees, and the unified-framework view of
-prior methods.
+Equivalently, the update defines an endpoint energy `−log r(s, a)`, up to a
+normalizing constant. PPO and GRPO learn the ratio through an auxiliary
+network; policy mirror descent (PMD) has an analytic exponential-advantage
+ratio. These different update rules therefore produce different tilts within
+the same framework.
 
-> Code release accompanying the paper (NeurIPS 2026). Preprint forthcoming.
+Doob's *h*-transform gives the diffusion dynamics that realize the chosen
+endpoint tilt. Under the paper's assumptions, this diffusion path minimizes
+control energy among processes with that endpoint law. A **conditional drift
+matching** objective then turns the theoretical construction into a simple
+ratio-weighted score-matching or flow-matching update. The paper establishes
+the relation between this tractable objective and ideal drift matching for
+both policy classes. See the manuscript for the precise statements and
+assumptions.
+
+> Manuscript (2026). Public paper link forthcoming.
 >
 > **Project page:** https://tianmanyue.github.io/LFGPO
 
@@ -60,6 +65,9 @@ XLA_PYTHON_CLIENT_MEM_FRACTION=.2 \
 python scripts/train_mujoco.py --alg lfgpo --env Ant-v4 --seed 100
 ```
 
+The historical `lfgpo` flag runs DoobPPO with a diffusion policy; CLI flags
+are retained for reproducibility.
+
 Logs (TensorBoard + wandb + final eval CSV) land in
 `logs/<env>/<alg>_<timestamp>_s<seed>_<suffix>/`.
 
@@ -69,25 +77,24 @@ per-task tuned hyperparameters of the on-policy flow baselines (`fpo_flow`,
 
 ---
 
-## Our methods (LFGPO instantiations)
+## Our methods (DoobPO instantiations)
 
-LFGPO is parameterised along two axes — **generative policy class**
-(diffusion / flow) and **ratio-learning rule** (PMD / PPO / GRPO). The
-combinations introduced in this paper are:
+DoobPO is parameterized by the **generative policy class** (diffusion or
+flow) and the **ratio update rule** (PMD, PPO, or GRPO). The combinations
+introduced in the manuscript are:
 
 | Paper name      | Generative class | Ratio update | `--alg` flag        |
 | --------------- | ---------------- | ------------ | ------------------- |
-| **LFGPO-PPO (DP)**  | Diffusion    | PPO learned ratio | `lfgpo`          |
-| **LFGPO-GRPO (DP)** | Diffusion    | GRPO learned ratio | `lfgpo_grpo`    |
-| **LFGPO-PMD (Flow)**  | Flow       | PMD (analytic, exp-advantage) | `fpmd`     |
-| **LFGPO-PPO (Flow)**  | Flow       | PPO learned ratio | `lfgpo_flow`     |
-| **LFGPO-GRPO (Flow)** | Flow       | GRPO learned ratio | `lfgpo_flow_grpo` |
+| **DoobPPO (Diffusion)**  | Diffusion | PPO learned ratio | `lfgpo`          |
+| **DoobGRPO (Diffusion)** | Diffusion | GRPO learned ratio | `lfgpo_grpo`    |
+| **DoobPMD (Flow)**       | Flow      | PMD (analytic, exp-advantage) | `fpmd` |
+| **DoobPPO (Flow)**      | Flow      | PPO learned ratio | `lfgpo_flow`     |
+| **DoobGRPO (Flow)**     | Flow      | GRPO learned ratio | `lfgpo_flow_grpo` |
 
-The diffusion analytic-ratio instantiation (LFGPO-PMD applied to a
-diffusion policy) is **not new**: it coincides with prior work DPMD
-([Ma et al. 2025](https://arxiv.org/abs/2502.00361)), and the paper shows
-DPMD arises as a special case of the LFGPO framework. We therefore list
-it as a baseline below rather than as one of our methods.
+The diffusion analytic-ratio instantiation of DoobPMD is **not new**: it
+coincides with prior work DPMD
+([Ma et al. 2025](https://arxiv.org/abs/2502.00361)). The manuscript shows
+how DPMD fits this framework, so it is listed as a baseline below.
 
 ## Baselines
 
@@ -128,12 +135,12 @@ scripts/train_mujoco.py      single training entry point
 
 ## Citation
 
-<!-- TODO: replace with the official entry once the arXiv / proceedings version is public. -->
+<!-- Manuscript citation; update if an official public version becomes available. -->
 ```bibtex
-@inproceedings{su2026lfgpo,
-  author    = {Su, Maojiang and Zhu, Qijie and Yu, Shuyang and Xiao, Yu and Chen, Minshuo and Wang, Zhaoran and Liu, Han},
-  title     = {Likelihood-Free Generative Policy Optimization},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2026},
+@misc{su2026doobpo,
+  author = {Su, Maojiang and Zhu, Qijie and Xiao, Yu and Yu, Shuyang and Chen, Minshuo and Wang, Zhaoran and Liu, Han},
+  title  = {Doob-Based Generative Policy Optimization},
+  year   = {2026},
+  note   = {NeurIPS 2026 manuscript},
 }
 ```
