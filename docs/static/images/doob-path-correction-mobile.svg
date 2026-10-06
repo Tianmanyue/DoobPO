@@ -13,14 +13,14 @@
     </marker>
     <style>
       text { font-family: 'Noto Sans', Arial, sans-serif; fill: #363d47; }
-      .small { font-size: 14px; fill: #697586; }
-      .label { font-size: 17px; font-weight: 600; }
-      .path-label { font-size: 16px; font-weight: 600; }
+      .small { font-size: 16px; fill: #697586; }
+      .label { font-size: 20px; font-weight: 600; }
+      .path-label { font-size: 18px; font-weight: 600; }
       .axis { stroke: #cdd5de; stroke-width: 1.4; }
     </style>
   </defs>
   <rect x="1" y="1" width="478" height="618" rx="9" fill="#ffffff" stroke="#d8e0e8"/>
-  <text x="24" y="31" class="small" letter-spacing="0.6">DIFFUSION · NOISE TO ACTION</text>
+  <text x="24" y="31" class="small" letter-spacing="0.6">DIFFUSION &#183; NOISE TO ACTION</text>
 
   <path d="M 160 132 C 174 132 184 125 192 107 C 201 87 212 79 225 79 C 241 79 250 91 257 110 C 265 126 277 132 292 132 L 160 132 Z"
         fill="#eff2f6" stroke="#8995a2" stroke-width="2"/>
@@ -36,27 +36,27 @@
   <path d="M 65 301 C 76 301 85 296 93 281 C 102 263 113 260 125 268 C 137 278 143 298 162 301 L 65 301 Z"
         fill="#eff2f6" stroke="#8995a2" stroke-width="2"/>
   <line x1="61" y1="301" x2="168" y2="301" class="axis"/>
-  <text x="115" y="330" text-anchor="middle" class="label">p<tspan baseline-shift="sub" font-size="11">t</tspan></text>
+  <text x="115" y="333" text-anchor="middle" class="label">p<tspan baseline-shift="sub" font-size="14">t</tspan></text>
   <path d="M 183 280 L 281 280" fill="none" stroke="#8995a2" stroke-width="2" marker-end="url(#arrow-gray)"/>
   <path d="M 299 301 C 309 301 318 297 327 279 C 337 260 349 257 360 266 C 374 276 381 299 403 301 L 299 301 Z"
         fill="#eff2f6" stroke="#8995a2" stroke-width="2"/>
   <line x1="295" y1="301" x2="409" y2="301" class="axis"/>
-  <text x="352" y="330" text-anchor="middle" class="label">old policy</text>
+  <text x="352" y="333" text-anchor="middle" class="label">old policy</text>
 
   <path d="M 229 345 L 229 409" fill="none" stroke="#2b9697" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-teal)"/>
   <text x="240" y="370" class="small" style="fill:#2b9697">Doob drift</text>
-  <text x="240" y="390" class="small" style="fill:#2b9697">correction Δb<tspan baseline-shift="sub" font-size="10">t</tspan></text>
+  <text x="240" y="391" class="small" style="fill:#2b9697">correction &#916;b<tspan baseline-shift="sub" font-size="12">t</tspan></text>
 
   <text x="63" y="438" class="path-label" style="fill:#3273dc">Doob-corrected dynamics</text>
   <path d="M 65 518 C 77 518 89 513 98 501 C 108 487 120 480 132 486 C 145 493 147 515 162 518 L 65 518 Z"
         fill="#eaf1fc" stroke="#3273dc" stroke-width="2.4"/>
   <line x1="61" y1="518" x2="168" y2="518" class="axis"/>
-  <text x="115" y="548" text-anchor="middle" class="label" style="fill:#3273dc">p<tspan baseline-shift="sub" font-size="11">t</tspan><tspan baseline-shift="super" font-size="11">h</tspan></text>
+  <text x="115" y="551" text-anchor="middle" class="label" style="fill:#3273dc">p<tspan baseline-shift="sub" font-size="14">t</tspan><tspan baseline-shift="super" font-size="14">h</tspan></text>
   <path d="M 183 497 L 281 497" fill="none" stroke="#3273dc" stroke-width="2.4" marker-end="url(#arrow-blue)"/>
   <path d="M 299 518 C 310 518 323 515 332 505 C 342 494 347 477 357 473 C 370 468 383 492 388 506 C 392 516 399 518 403 518 L 299 518 Z"
         fill="#eaf1fc" stroke="#3273dc" stroke-width="2.4"/>
   <line x1="295" y1="518" x2="409" y2="518" class="axis"/>
-  <text x="352" y="548" text-anchor="middle" class="label" style="fill:#3273dc">tilted policy</text>
+  <text x="352" y="551" text-anchor="middle" class="label" style="fill:#3273dc">tilted policy</text>
 
-  <text x="456" y="595" text-anchor="end" class="small">schematic · one observation</text>
+  <text x="456" y="595" text-anchor="end" class="small">schematic &#183; one observation</text>
 </svg>

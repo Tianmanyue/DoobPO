@@ -13,9 +13,9 @@
     </marker>
     <style>
       text { font-family: 'Noto Sans', Arial, sans-serif; fill: #363d47; }
-      .small { font-size: 12px; fill: #697586; }
-      .label { font-size: 15px; font-weight: 600; }
-      .path-label { font-size: 13px; font-weight: 600; }
+      .small { font-size: 15px; fill: #697586; }
+      .label { font-size: 18px; font-weight: 600; }
+      .path-label { font-size: 16px; font-weight: 600; }
       .axis { stroke: #cdd5de; stroke-width: 1.4; }
     </style>
   </defs>
@@ -28,7 +28,7 @@
         fill="#eff2f6" stroke="#8995a2" stroke-width="2"/>
   <line x1="49" y1="205" x2="224" y2="205" class="axis"/>
   <text x="137" y="236" text-anchor="middle" class="label">noise prior</text>
-  <text x="137" y="254" text-anchor="middle" class="small">practical shared start</text>
+  <text x="137" y="258" text-anchor="middle" class="small">shared start</text>
 
   <!-- Split into reference and Doob-corrected dynamics. -->
   <path d="M 226 186 C 267 183 272 106 324 106" fill="none" stroke="#8995a2" stroke-width="2" marker-end="url(#arrow-gray)"/>
@@ -39,33 +39,33 @@
   <path d="M 337 133 C 353 132 366 124 376 108 C 388 87 401 86 415 97 C 431 111 436 127 458 132 C 469 134 482 133 492 133 L 337 133 Z"
         fill="#eff2f6" stroke="#8995a2" stroke-width="2"/>
   <line x1="333" y1="133" x2="498" y2="133" class="axis"/>
-  <text x="415" y="156" text-anchor="middle" class="label">p<tspan baseline-shift="sub" font-size="10">t</tspan></text>
+  <text x="415" y="160" text-anchor="middle" class="label">p<tspan baseline-shift="sub" font-size="13">t</tspan></text>
 
   <text x="414" y="204" text-anchor="middle" class="path-label" style="fill:#3273dc">Doob-corrected dynamics</text>
   <path d="M 337 274 C 350 274 365 268 378 256 C 392 240 407 233 421 239 C 439 247 445 269 466 273 C 474 274 483 274 492 274 L 337 274 Z"
         fill="#eaf1fc" stroke="#3273dc" stroke-width="2.4"/>
   <line x1="333" y1="274" x2="498" y2="274" class="axis"/>
-  <text x="415" y="298" text-anchor="middle" class="label" style="fill:#3273dc">p<tspan baseline-shift="sub" font-size="10">t</tspan><tspan baseline-shift="super" font-size="10">h</tspan></text>
+  <text x="415" y="302" text-anchor="middle" class="label" style="fill:#3273dc">p<tspan baseline-shift="sub" font-size="13">t</tspan><tspan baseline-shift="super" font-size="13">h</tspan></text>
 
   <path d="M 507 107 C 556 107 618 107 688 107" fill="none" stroke="#8995a2" stroke-width="2" marker-end="url(#arrow-gray)"/>
   <path d="M 507 248 C 556 248 618 248 688 248" fill="none" stroke="#3273dc" stroke-width="2.4" marker-end="url(#arrow-blue)"/>
 
   <!-- The change in drift acts along generation. -->
   <path d="M 599 134 L 599 220" fill="none" stroke="#2b9697" stroke-width="1.8" stroke-dasharray="4 4" marker-end="url(#arrow-teal)"/>
-  <rect x="606" y="166" width="103" height="37" fill="#ffffff"/>
+  <rect x="606" y="162" width="148" height="48" fill="#ffffff"/>
   <text x="611" y="181" class="small" style="fill:#2b9697">Doob drift</text>
-  <text x="611" y="196" class="small" style="fill:#2b9697">correction &#916;b<tspan baseline-shift="sub" font-size="9">t</tspan></text>
+  <text x="611" y="201" class="small" style="fill:#2b9697">correction &#916;b<tspan baseline-shift="sub" font-size="11">t</tspan></text>
 
   <!-- Endpoint action distributions. -->
   <path d="M 705 133 C 722 133 733 127 743 108 C 753 87 766 82 780 93 C 793 103 798 125 814 132 C 825 134 840 133 861 133 L 705 133 Z"
         fill="#eff2f6" stroke="#8995a2" stroke-width="2"/>
   <line x1="701" y1="133" x2="866" y2="133" class="axis"/>
-  <text x="783" y="156" text-anchor="middle" class="label">old action policy</text>
+  <text x="783" y="160" text-anchor="middle" class="label">old action policy</text>
 
   <path d="M 705 274 C 724 274 739 269 751 260 C 766 249 776 224 790 219 C 805 214 819 236 825 253 C 832 270 846 274 861 274 L 705 274 Z"
         fill="#eaf1fc" stroke="#3273dc" stroke-width="2.4"/>
   <line x1="701" y1="274" x2="866" y2="274" class="axis"/>
-  <text x="783" y="298" text-anchor="middle" class="label" style="fill:#3273dc">tilted action policy</text>
+  <text x="783" y="302" text-anchor="middle" class="label" style="fill:#3273dc">tilted action policy</text>
 
   <text x="932" y="326" text-anchor="end" class="small">schematic &#183; one observation</text>
 </svg>

@@ -187,6 +187,14 @@
             old action distribution. Curve shapes illustrate the mechanism, not a fixed direction of improvement.
           </figcaption>
         </figure>
+        <div class="content has-text-justified method-bridge">
+          <p>
+            For PPO and GRPO, the positive ratio is learned with the chosen update objective;
+            for PMD, it has an analytic form. Once the ratio is available, every rule follows
+            the same distribution-level step: reweight the old policy and normalize. The
+            negative log ratio is the endpoint energy that describes this tilt.
+          </p>
+        </div>
         <div class="box">
           <p class="has-text-centered">
             \[
@@ -227,6 +235,14 @@
             \(p_t^h\) end at \(\pi_{\mathrm{target}}\). Sampling runs from \(X_T\) to \(X_0\).
           </figcaption>
         </figure>
+        <div class="content has-text-justified method-bridge">
+          <p>
+            The action-endpoint ratio induces an intermediate weight \(h_t\): its expected
+            value conditioned on the current state of the reference diffusion. The spatial
+            log gradient of this weight supplies the added drift shown in the diagram.
+            The next step trains that drift without sampling the ideal corrected path.
+          </p>
+        </div>
         <div class="box">
           <p class="has-text-centered">
             \[
