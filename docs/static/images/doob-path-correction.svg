@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" role="img" aria-labelledby="title desc">
+  <title id="title">Doob correction changes the diffusion path to reach a tilted action policy</title>
+  <desc id="desc">A practical Gaussian noise initialization branches into gray reference diffusion dynamics with intermediate marginal p t and old action policy, and blue Doob corrected dynamics with intermediate marginal p t h and tilted action policy. A vertical arrow indicates the Doob drift correction between paths. Density shapes are schematic.</desc>
+  <defs>
+    <marker id="arrow-gray" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="#8995a2"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="#3273dc"/>
+    </marker>
+    <marker id="arrow-teal" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="#2b9697"/>
+    </marker>
+    <style>
+      text { font-family: 'Noto Sans', Arial, sans-serif; fill: #363d47; }
+      .small { font-size: 12px; fill: #697586; }
+      .label { font-size: 15px; font-weight: 600; }
+      .path-label { font-size: 13px; font-weight: 600; }
+      .axis { stroke: #cdd5de; stroke-width: 1.4; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="958" height="338" rx="9" fill="#ffffff" stroke="#d8e0e8"/>
+
+  <text x="28" y="31" class="small" letter-spacing="1.2">DIFFUSION &#183; GENERATION FROM NOISE TO ACTION</text>
+
+  <!-- The practical Gaussian source is shared by both sampling paths. -->
+  <path d="M 53 205 C 72 205 84 195 95 166 C 105 139 119 129 137 129 C 157 129 170 149 178 175 C 185 196 197 205 219 205 L 53 205 Z"
+        fill="#eff2f6" stroke="#8995a2" stroke-width="2"/>
+  <line x1="49" y1="205" x2="224" y2="205" class="axis"/>
+  <text x="137" y="236" text-anchor="middle" class="label">noise prior</text>
+  <text x="137" y="254" text-anchor="middle" class="small">practical shared start</text>
+
+  <!-- Split into reference and Doob-corrected dynamics. -->
+  <path d="M 226 186 C 267 183 272 106 324 106" fill="none" stroke="#8995a2" stroke-width="2" marker-end="url(#arrow-gray)"/>
+  <path d="M 226 192 C 267 195 272 248 324 248" fill="none" stroke="#3273dc" stroke-width="2.4" marker-end="url(#arrow-blue)"/>
+
+  <!-- Intermediate marginals, not individual trajectories. -->
+  <text x="414" y="68" text-anchor="middle" class="path-label" fill="#697586">reference dynamics</text>
+  <path d="M 337 133 C 353 132 366 124 376 108 C 388 87 401 86 415 97 C 431 111 436 127 458 132 C 469 134 482 133 492 133 L 337 133 Z"
+        fill="#eff2f6" stroke="#8995a2" stroke-width="2"/>
+  <line x1="333" y1="133" x2="498" y2="133" class="axis"/>
+  <text x="415" y="156" text-anchor="middle" class="label">p<tspan baseline-shift="sub" font-size="10">t</tspan></text>
+
+  <text x="414" y="204" text-anchor="middle" class="path-label" style="fill:#3273dc">Doob-corrected dynamics</text>
+  <path d="M 337 274 C 350 274 365 268 378 256 C 392 240 407 233 421 239 C 439 247 445 269 466 273 C 474 274 483 274 492 274 L 337 274 Z"
+        fill="#eaf1fc" stroke="#3273dc" stroke-width="2.4"/>
+  <line x1="333" y1="274" x2="498" y2="274" class="axis"/>
+  <text x="415" y="298" text-anchor="middle" class="label" style="fill:#3273dc">p<tspan baseline-shift="sub" font-size="10">t</tspan><tspan baseline-shift="super" font-size="10">h</tspan></text>
+
+  <path d="M 507 107 C 556 107 618 107 688 107" fill="none" stroke="#8995a2" stroke-width="2" marker-end="url(#arrow-gray)"/>
+  <path d="M 507 248 C 556 248 618 248 688 248" fill="none" stroke="#3273dc" stroke-width="2.4" marker-end="url(#arrow-blue)"/>
+
+  <!-- The change in drift acts along generation. -->
+  <path d="M 599 134 L 599 220" fill="none" stroke="#2b9697" stroke-width="1.8" stroke-dasharray="4 4" marker-end="url(#arrow-teal)"/>
+  <rect x="606" y="166" width="103" height="37" fill="#ffffff"/>
+  <text x="611" y="181" class="small" style="fill:#2b9697">Doob drift</text>
+  <text x="611" y="196" class="small" style="fill:#2b9697">correction &#916;b<tspan baseline-shift="sub" font-size="9">t</tspan></text>
+
+  <!-- Endpoint action distributions. -->
+  <path d="M 705 133 C 722 133 733 127 743 108 C 753 87 766 82 780 93 C 793 103 798 125 814 132 C 825 134 840 133 861 133 L 705 133 Z"
+        fill="#eff2f6" stroke="#8995a2" stroke-width="2"/>
+  <line x1="701" y1="133" x2="866" y2="133" class="axis"/>
+  <text x="783" y="156" text-anchor="middle" class="label">old action policy</text>
+
+  <path d="M 705 274 C 724 274 739 269 751 260 C 766 249 776 224 790 219 C 805 214 819 236 825 253 C 832 270 846 274 861 274 L 705 274 Z"
+        fill="#eaf1fc" stroke="#3273dc" stroke-width="2.4"/>
+  <line x1="701" y1="274" x2="866" y2="274" class="axis"/>
+  <text x="783" y="298" text-anchor="middle" class="label" style="fill:#3273dc">tilted action policy</text>
+
+  <text x="932" y="326" text-anchor="end" class="small">schematic &#183; one observation</text>
+</svg>

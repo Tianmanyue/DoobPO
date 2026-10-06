@@ -172,3 +172,13 @@ body {
 .plot-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.3rem 1rem; margin: 0.5rem 0; font-size: 0.8rem; }
 .plot-legend span { display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
 .legend-swatch { display: inline-block; width: 20px; height: 3px; background: var(--legend-color); }
+
+/* Compact figures within the original paper-page method column. */
+.teaser .hero-body { padding-bottom: 2rem; }
+section.section { padding-top: 2.25rem; padding-bottom: 2.25rem; }
+#method .title.is-4 { margin-bottom: 0.75rem; }
+#method .content { margin-bottom: 0.8rem; }
+#method .box { margin: 0.9rem 0 1.5rem; padding: 1rem 1.25rem; }
+.method-figure { margin: 0.8rem 0 1.1rem; }
+.method-figure picture, .method-figure img { display: block; width: 100%; height: auto; }
+.method-figure figcaption { margin-top: 0.45rem; color: #555; font-size: 0.85rem; line-height: 1.45; text-align: justify; }

@@ -172,8 +172,21 @@
             closed-form target ratio, so DoobPO learns a lightweight positive ratio model
             \(r_\beta(o,a)\) with their respective RL objectives. A regularizer encourages
             \(\mathbb{E}_{a\sim\pi_{\mathrm{old}}(\cdot\mid o)}[r_\beta(o,a)]=1\).
+            Both updates start from the same old policy; their learned ratios specify different
+            target action distributions.
           </p>
         </div>
+        <figure class="method-figure">
+          <picture>
+            <source media="(max-width: 600px)" srcset="./static/images/update-rule-tilts-mobile.svg">
+            <img src="./static/images/update-rule-tilts.svg" width="960" height="340"
+                 alt="One old action distribution branches into distinct single-update PPO and GRPO tilted distributions, each shown against the same gray base curve.">
+          </picture>
+          <figcaption>
+            At one observation, PPO and GRPO each learn a positive ratio that tilts the same
+            old action distribution. Curve shapes illustrate the mechanism, not a fixed direction of improvement.
+          </figcaption>
+        </figure>
         <div class="box">
           <p class="has-text-centered">
             \[
@@ -196,10 +209,24 @@
           <p>
             For diffusion policies, Doob's <em>h</em>-transform propagates the endpoint
             preference through the pretrained denoising process. The resulting process has
-            the ratio-tilted action distribution as its endpoint (Lemma 3.1). For flow
-            policies, terminal reweighting likewise defines a tilted path.
+            the ratio-tilted action distribution as its endpoint (Lemma 3.1). The diffusion
+            drift correction changes intermediate distributions during generation, reaching
+            the chosen action law. For flow policies, terminal reweighting defines the
+            corresponding tilted marginals, learned through weighted velocity matching.
           </p>
         </div>
+        <figure class="method-figure">
+          <picture>
+            <source media="(max-width: 600px)" srcset="./static/images/doob-path-correction-mobile.svg">
+            <img src="./static/images/doob-path-correction.svg" width="960" height="340"
+                 alt="From a practical shared Gaussian noise initialization, the gray reference diffusion path reaches the old action policy while a blue Doob-corrected path reaches the ratio-tilted action policy.">
+          </picture>
+          <figcaption>
+            Diffusion schematic under independent Gaussian noise initialization: the reference
+            marginals \(p_t\) end at \(\pi_{\mathrm{old}}\), while the corrected marginals
+            \(p_t^h\) end at \(\pi_{\mathrm{target}}\). Sampling runs from \(X_T\) to \(X_0\).
+          </figcaption>
+        </figure>
         <div class="box">
           <p class="has-text-centered">
             \[

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600" role="img" aria-labelledby="title desc">
+  <title id="title">A shared policy distribution branches into PPO and GRPO tilts</title>
+  <desc id="desc">Mobile schematic for one observation. A reference policy distribution at the top feeds two stacked target plots. The PPO and GRPO targets use learned positive auxiliary ratios. Dashed gray reference curves have the same shape and position in both target plots; blue and teal curves are illustrative targets, not fixed tilt directions.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="#8b98a6"/>
+    </marker>
+  </defs>
+
+  <!-- Shared base. -->
+  <rect x="72.5" y="18.5" width="387" height="145" rx="4" fill="#fff" stroke="#dce3ea"/>
+  <text x="96" y="47" fill="#222b36" font-family="Noto Sans, Arial, sans-serif" font-size="17" font-weight="600">Reference policy</text>
+  <text x="96" y="66" fill="#687684" font-family="Noto Sans, Arial, sans-serif" font-size="13">π_old(a | o)</text>
+  <path d="M 95 142 H 438" stroke="#b7c2cc" stroke-width="1"/>
+  <path d="M 95 142 C 139 142 166 139 191 120 C 210 102 223 85 247 84 C 271 83 285 110 303 126 C 325 141 357 142 438 142 L 95 142 Z" fill="#eef1f4"/>
+  <path d="M 95 142 C 139 142 166 139 191 120 C 210 102 223 85 247 84 C 271 83 285 110 303 126 C 325 141 357 142 438 142" fill="none" stroke="#677889" stroke-width="2.4" stroke-linecap="round"/>
+  <text x="426" y="158" fill="#8793a0" font-family="Noto Sans, Arial, sans-serif" font-size="11">a</text>
+
+  <!-- The side rail makes the shared origin explicit at narrow widths. -->
+  <path d="M 72 99 H 34 V 456" fill="none" stroke="#9aa7b4" stroke-width="1.5"/>
+  <path d="M 34 282 H 69" fill="none" stroke="#9aa7b4" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 34 456 H 69" fill="none" stroke="#9aa7b4" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- PPO target and the same reference distribution. -->
+  <rect x="72.5" y="207.5" width="387" height="150" rx="4" fill="#fff" stroke="#dce3ea"/>
+  <text x="96" y="235" fill="#222b36" font-family="Noto Sans, Arial, sans-serif" font-size="17" font-weight="600">PPO tilt</text>
+  <text x="365" y="234" fill="#3273dc" font-family="Noto Sans, Arial, sans-serif" font-size="12" font-weight="600">r_PPO &gt; 0</text>
+  <path d="M 95 336 H 438" stroke="#b7c2cc" stroke-width="1"/>
+  <path d="M 95 336 C 139 336 166 333 191 314 C 210 296 223 279 247 278 C 271 277 285 304 303 320 C 325 335 357 336 438 336" fill="none" stroke="#a7b2bd" stroke-width="1.8" stroke-dasharray="5 5" stroke-linecap="round"/>
+  <path d="M 95 336 C 159 336 196 332 223 316 C 243 300 256 279 289 278 C 315 277 330 306 350 323 C 372 335 403 336 438 336 L 95 336 Z" fill="#3273dc" fill-opacity="0.09"/>
+  <path d="M 95 336 C 159 336 196 332 223 316 C 243 300 256 279 289 278 C 315 277 330 306 350 323 C 372 335 403 336 438 336" fill="none" stroke="#3273dc" stroke-width="2.6" stroke-linecap="round"/>
+  <text x="426" y="352" fill="#8793a0" font-family="Noto Sans, Arial, sans-serif" font-size="11">a</text>
+
+  <!-- GRPO target and the identical dashed reference distribution. -->
+  <rect x="72.5" y="381.5" width="387" height="150" rx="4" fill="#fff" stroke="#dce3ea"/>
+  <text x="96" y="409" fill="#222b36" font-family="Noto Sans, Arial, sans-serif" font-size="17" font-weight="600">GRPO tilt</text>
+  <text x="356" y="408" fill="#2b9697" font-family="Noto Sans, Arial, sans-serif" font-size="12" font-weight="600">r_GRPO &gt; 0</text>
+  <path d="M 95 510 H 438" stroke="#b7c2cc" stroke-width="1"/>
+  <path d="M 95 510 C 139 510 166 507 191 488 C 210 470 223 453 247 452 C 271 451 285 478 303 494 C 325 509 357 510 438 510" fill="none" stroke="#a7b2bd" stroke-width="1.8" stroke-dasharray="5 5" stroke-linecap="round"/>
+  <path d="M 95 510 C 135 510 154 507 174 490 C 191 475 198 454 218 452 C 243 450 257 480 274 496 C 293 508 338 510 438 510 L 95 510 Z" fill="#2b9697" fill-opacity="0.09"/>
+  <path d="M 95 510 C 135 510 154 507 174 490 C 191 475 198 454 218 452 C 243 450 257 480 274 496 C 293 508 338 510 438 510" fill="none" stroke="#2b9697" stroke-width="2.6" stroke-linecap="round"/>
+  <text x="426" y="526" fill="#8793a0" font-family="Noto Sans, Arial, sans-serif" font-size="11">a</text>
+
+  <path d="M 89 553 H 113" fill="none" stroke="#a7b2bd" stroke-width="1.8" stroke-dasharray="5 5"/>
+  <text x="119" y="557" fill="#687684" font-family="Noto Sans, Arial, sans-serif" font-size="11">same base</text>
+  <path d="M 215 553 H 239" fill="none" stroke="#3273dc" stroke-width="2.6"/>
+  <text x="245" y="557" fill="#687684" font-family="Noto Sans, Arial, sans-serif" font-size="11">PPO target</text>
+  <path d="M 345 553 H 369" fill="none" stroke="#2b9697" stroke-width="2.6"/>
+  <text x="375" y="557" fill="#687684" font-family="Noto Sans, Arial, sans-serif" font-size="11">GRPO target</text>
+  <text x="240" y="586" text-anchor="middle" fill="#566474" font-family="Noto Sans, Arial, sans-serif" font-size="13">π_target(a | o) ∝ r_rule(o, a) π_old(a | o)</text>
+</svg>
