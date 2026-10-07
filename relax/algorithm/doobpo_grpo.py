@@ -1,5 +1,5 @@
 """
-DoobPO-GRPO: same off-policy backbone as DoobPO, but ratio-network training uses a
+DoobGRPO: same off-policy backbone as DoobPO, but ratio-network training uses a
 GRPO-style *group-relative* advantage; the ratio surrogate matches DoobPO's PPO-style
 clipping (evaluated at each (s, a_k) over the K on-policy samples).
 

@@ -94,9 +94,9 @@ if __name__ == "__main__":
                         help="gradient steps over which policy lr decays from lr to lr_schedule_end")
     parser.add_argument("--n_epochs", type=int, default=4,
                         help="PPO epochs per rollout batch (on-policy flow baselines only)")
-    # DoobPO-GRPO (diffusion)
+    # DoobGRPO (diffusion)
     parser.add_argument("--grpo_group_size", type=int, default=8,
-                        help="DoobPO-GRPO: number of action samples per state for group-relative advantage")
+                        help="DoobGRPO: number of action samples per state for group-relative advantage")
     # ---- Flow-matching methods (all _flow suffix, won't conflict with diffusion args) ----
     parser.add_argument("--flow_steps", type=int, default=20,
                         help="Flow: ODE Euler integration steps")
