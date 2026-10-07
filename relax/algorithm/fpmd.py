@@ -1,7 +1,7 @@
 """
-FPMD: Flow Policy Mirror Descent — the LFGPO-PMD instantiation for flow policies.
+FPMD: Flow Policy Mirror Descent — the DoobPO-PMD instantiation for flow policies.
 
-One of the algorithms introduced by the LFGPO framework (``LFGPO-PMD`` in
+One of the algorithms introduced by the DoobPO framework (``DoobPO-PMD`` in
 the paper, flow-policy variant). Under a KL-proximal policy mirror descent
 update, the optimal probability ratio admits the closed form
 ``r(s, a) ∝ exp(A_old(s, a) / λ)``. FPMD bypasses learning a ratio network

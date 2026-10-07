@@ -1,5 +1,5 @@
 """
-Network factory for LFGPO-Flow.
+Network factory for DoobPO-Flow.
 
 Combines a FlowPPONet (flow matching policy + V(s) value network) with
 a lightweight ratio network r_β: (obs, act) → ℝ₊.
@@ -16,10 +16,10 @@ import haiku as hk
 
 from relax.network.blocks import Activation, QNet
 from relax.network.flow_ppo import FlowPPONet, FlowPPOParams, create_flow_ppo_net
-from relax.network.lfgpo import create_ratio_net, create_ratio_net_resnet
+from relax.network.doobpo import create_ratio_net, create_ratio_net_resnet
 
 
-def create_lfgpo_flow_net(
+def create_doobpo_flow_net(
     key: jax.Array,
     obs_dim: int,
     act_dim: int,
@@ -31,7 +31,7 @@ def create_lfgpo_flow_net(
     num_steps: int = 10,
     ratio_hidden_sizes: Optional[Sequence[int]] = None,
     ratio_net_type: str = "mlp",
-    # ~same param count as MLP 256×3: one ResBlock = two 256→256 layers (see lfgpo.py doc).
+    # ~same param count as MLP 256×3: one ResBlock = two 256→256 layers (see doobpo.py doc).
     ratio_resnet_hidden_dim: int = 256,
     ratio_resnet_num_blocks: int = 1,
     include_twin_q: bool = True,
@@ -46,7 +46,7 @@ def create_lfgpo_flow_net(
     Optional[hk.Params],
     Optional[hk.Params],
 ]:
-    """Create all networks for LFGPO-Flow.
+    """Create all networks for DoobPO-Flow.
 
     Returns
     -------

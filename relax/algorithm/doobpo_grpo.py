@@ -1,6 +1,6 @@
 """
-LFGPO-GRPO: same off-policy backbone as LFGPO, but ratio-network training uses a
-GRPO-style *group-relative* advantage; the ratio surrogate matches LFGPO's PPO-style
+DoobPO-GRPO: same off-policy backbone as DoobPO, but ratio-network training uses a
+GRPO-style *group-relative* advantage; the ratio surrogate matches DoobPO's PPO-style
 clipping (evaluated at each (s, a_k) over the K on-policy samples).
 
 For each replay state s, sample K actions from the current policy π(·|s) (stop-grad).
@@ -9,16 +9,16 @@ group-normalised advantages
 
     A_grpo_k = (Q_k - mean_j Q_j) / (std_j Q_j + ε)   (normalisation across the K samples)
 
-Ratio loss (PPO clipping on r_β, same form as LFGPO):
+Ratio loss (PPO clipping on r_β, same form as DoobPO):
 
     L_ratio = - E[ min( r_β A, clip(r_β, 1±ε) A ) ]
               + λ · (mean_{group1} r_β - 1) · (mean_{group2} r_β - 1)
 
-The regulariser follows the same unbiased double-mean trick as LFGPO, but both means
+The regulariser follows the same unbiased double-mean trick as DoobPO, but both means
 are taken over independent on-policy action groups (instead of buffer vs π).
 
 Policy drift-matching still uses replay (s, a_buf) with stop-grad weights r_β(s, a_buf),
-identical to LFGPO.
+identical to DoobPO.
 """
 
 from typing import Tuple
@@ -31,14 +31,14 @@ import haiku as hk
 import pickle
 
 from relax.algorithm.base import Algorithm
-from relax.algorithm.lfgpo import LFGPOOptStates, LFGPOParams, LFGPOTrainState
+from relax.algorithm.doobpo import DoobPOOptStates, DoobPOParams, DoobPOTrainState
 from relax.network.diffv2 import Diffv2Net, Diffv2Params
 from relax.utils.experience import Experience
 from relax.utils.typing_utils import Metric
 
 
-class LFGPOGRPO(Algorithm):
-    """Off-policy LFGPO with GRPO-style group-relative ratio learning."""
+class DoobPOGRPO(Algorithm):
+    """Off-policy DoobPO with GRPO-style group-relative ratio learning."""
 
     def __init__(
         self,
@@ -86,7 +86,7 @@ class LFGPOGRPO(Algorithm):
         self.ratio_optim = optax.adam(ratio_lr)
         self.alpha_optim = optax.adam(alpha_lr)
 
-        lfgpo_params = LFGPOParams(
+        doobpo_params = DoobPOParams(
             q1=params.q1,
             q2=params.q2,
             target_q1=params.target_q1,
@@ -97,14 +97,14 @@ class LFGPOGRPO(Algorithm):
             log_alpha=params.log_alpha,
         )
 
-        self.state = LFGPOTrainState(
-            params=lfgpo_params,
-            opt_state=LFGPOOptStates(
-                q1=self.q_optim.init(lfgpo_params.q1),
-                q2=self.q_optim.init(lfgpo_params.q2),
-                policy=self.policy_optim.init(lfgpo_params.policy),
-                ratio=self.ratio_optim.init(lfgpo_params.ratio),
-                log_alpha=self.alpha_optim.init(lfgpo_params.log_alpha),
+        self.state = DoobPOTrainState(
+            params=doobpo_params,
+            opt_state=DoobPOOptStates(
+                q1=self.q_optim.init(doobpo_params.q1),
+                q2=self.q_optim.init(doobpo_params.q2),
+                policy=self.policy_optim.init(doobpo_params.policy),
+                ratio=self.ratio_optim.init(doobpo_params.ratio),
+                log_alpha=self.alpha_optim.init(doobpo_params.log_alpha),
             ),
             step=jnp.int32(0),
             entropy=jnp.float32(0.0),
@@ -120,9 +120,9 @@ class LFGPOGRPO(Algorithm):
         @jax.jit
         def stateless_update(
             key: jax.Array,
-            state: LFGPOTrainState,
+            state: DoobPOTrainState,
             data: Experience,
-        ) -> Tuple[LFGPOTrainState, Metric]:
+        ) -> Tuple[DoobPOTrainState, Metric]:
             obs, action, reward, next_obs, done = (
                 data.obs, data.action, data.reward, data.next_obs, data.done
             )
@@ -166,7 +166,7 @@ class LFGPOGRPO(Algorithm):
             (q1_loss, q1_val), q1_grads = jax.value_and_grad(q_loss_fn, has_aux=True)(q1_params)
             (q2_loss, q2_val), q2_grads = jax.value_and_grad(q_loss_fn, has_aux=True)(q2_params)
 
-            # Running stats (same as LFGPO: use buffer Q(s,a))
+            # Running stats (same as DoobPO: use buffer Q(s,a))
             q_sa = jax.lax.stop_gradient(min_q(target_q1, target_q2, obs, action))
 
             def sample_policy_actions(subkeys):
@@ -299,8 +299,8 @@ class LFGPOGRPO(Algorithm):
 
             r_flat_for_hist = jnp.reshape(r_beta_kb, (-1,))
 
-            new_state = LFGPOTrainState(
-                params=LFGPOParams(
+            new_state = DoobPOTrainState(
+                params=DoobPOParams(
                     q1=q1_params,
                     q2=q2_params,
                     target_q1=target_q1,
@@ -310,7 +310,7 @@ class LFGPOGRPO(Algorithm):
                     ratio=ratio_params_new,
                     log_alpha=log_alpha,
                 ),
-                opt_state=LFGPOOptStates(
+                opt_state=DoobPOOptStates(
                     q1=q1_opt_state,
                     q2=q2_opt_state,
                     policy=policy_opt_state,

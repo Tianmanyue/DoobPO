@@ -1,5 +1,5 @@
 """
-LFGPO: Learning via Doob h-transform (off-policy implementation)
+DoobPO: Learning via Doob h-transform (off-policy implementation)
 
 Architecture (Algorithm 1 from the paper):
   1. Q-network update: standard Bellman backup (single sample).
@@ -15,7 +15,7 @@ Architecture (Algorithm 1 from the paper):
 
 Key difference from DPMD:
   DPMD  → weights = exp(normalised_Q / alpha)  (direct advantage exponentiation)
-  LFGPO → weights = r_β (learned ratio net, PPO-clipped for stability)
+  DoobPO → weights = r_β (learned ratio net, PPO-clipped for stability)
 """
 
 from typing import NamedTuple, Tuple
@@ -37,7 +37,7 @@ from relax.utils.typing_utils import Metric
 # State containers
 # ---------------------------------------------------------------------------
 
-class LFGPOParams(NamedTuple):
+class DoobPOParams(NamedTuple):
     q1: hk.Params
     q2: hk.Params
     target_q1: hk.Params
@@ -48,7 +48,7 @@ class LFGPOParams(NamedTuple):
     log_alpha: jax.Array
 
 
-class LFGPOOptStates(NamedTuple):
+class DoobPOOptStates(NamedTuple):
     q1: optax.OptState
     q2: optax.OptState
     policy: optax.OptState
@@ -56,9 +56,9 @@ class LFGPOOptStates(NamedTuple):
     log_alpha: optax.OptState
 
 
-class LFGPOTrainState(NamedTuple):
-    params: LFGPOParams
-    opt_state: LFGPOOptStates
+class DoobPOTrainState(NamedTuple):
+    params: DoobPOParams
+    opt_state: DoobPOOptStates
     step: int
     entropy: float
     running_mean: float
@@ -69,7 +69,7 @@ class LFGPOTrainState(NamedTuple):
 # Main algorithm class
 # ---------------------------------------------------------------------------
 
-class LFGPO(Algorithm):
+class DoobPO(Algorithm):
     """Off-policy diffusion RL via Doob h-transform with a learned ratio net."""
 
     def __init__(
@@ -125,7 +125,7 @@ class LFGPO(Algorithm):
         self.alpha_optim = optax.adam(alpha_lr)
 
         # Build combined parameter / opt-state objects
-        lfgpo_params = LFGPOParams(
+        doobpo_params = DoobPOParams(
             q1=params.q1,
             q2=params.q2,
             target_q1=params.target_q1,
@@ -136,14 +136,14 @@ class LFGPO(Algorithm):
             log_alpha=params.log_alpha,
         )
 
-        self.state = LFGPOTrainState(
-            params=lfgpo_params,
-            opt_state=LFGPOOptStates(
-                q1=self.q_optim.init(lfgpo_params.q1),
-                q2=self.q_optim.init(lfgpo_params.q2),
-                policy=self.policy_optim.init(lfgpo_params.policy),
-                ratio=self.ratio_optim.init(lfgpo_params.ratio),
-                log_alpha=self.alpha_optim.init(lfgpo_params.log_alpha),
+        self.state = DoobPOTrainState(
+            params=doobpo_params,
+            opt_state=DoobPOOptStates(
+                q1=self.q_optim.init(doobpo_params.q1),
+                q2=self.q_optim.init(doobpo_params.q2),
+                policy=self.policy_optim.init(doobpo_params.policy),
+                ratio=self.ratio_optim.init(doobpo_params.ratio),
+                log_alpha=self.alpha_optim.init(doobpo_params.log_alpha),
             ),
             step=jnp.int32(0),
             entropy=jnp.float32(0.0),
@@ -161,11 +161,11 @@ class LFGPO(Algorithm):
         @jax.jit
         def stateless_update(
             key: jax.Array,
-            state: LFGPOTrainState,
+            state: DoobPOTrainState,
             data: Experience,
             use_precomputed_adv: bool,
             precomputed_adv: jax.Array,
-        ) -> Tuple[LFGPOTrainState, Metric]:
+        ) -> Tuple[DoobPOTrainState, Metric]:
 
             obs, action, reward, next_obs, done = (
                 data.obs, data.action, data.reward, data.next_obs, data.done
@@ -380,8 +380,8 @@ class LFGPO(Algorithm):
             new_running_mean = running_mean + 0.001 * (q_mean - running_mean)
             new_running_std = running_std + 0.001 * (q_std - running_std)
 
-            new_state = LFGPOTrainState(
-                params=LFGPOParams(
+            new_state = DoobPOTrainState(
+                params=DoobPOParams(
                     q1=q1_params,
                     q2=q2_params,
                     target_q1=target_q1,
@@ -391,7 +391,7 @@ class LFGPO(Algorithm):
                     ratio=ratio_params_new,
                     log_alpha=log_alpha,
                 ),
-                opt_state=LFGPOOptStates(
+                opt_state=DoobPOOptStates(
                     q1=q1_opt_state,
                     q2=q2_opt_state,
                     policy=policy_opt_state,

@@ -1,12 +1,12 @@
 """
-LFGPO-Flow: Flow Policy Optimization with Drift Matching.
+DoobPO-Flow: Flow Policy Optimization with Drift Matching.
 
 - **On-policy** (GAE): FlowPPONet V(s) + externally computed GAE advantages;
   ratio r_β with PPO clip; policy via ratio-weighted velocity matching.
 
 - **Off-policy** (replay buffer): Twin Q-networks + TD targets (no GAE).
   Advantage A(s,a) = min_i Q_i(s,a) − min_j Q_j(s, a'), a' ∼ π(·|s),
-  same construction as diffusion LFGPO (target twin-Q for both terms; π is flow policy).
+  same construction as diffusion DoobPO (target twin-Q for both terms; π is flow policy).
 
   One ``update()`` on a replay minibatch (default 1:1): **Q1 & Q2 each 1 Adam step** →
   **ratio_net 1 step** → **flow policy 1 step** (delayed by ``delay_policy_update``)
@@ -29,13 +29,13 @@ from relax.utils.experience import Experience, GAEExperience
 from relax.utils.typing_utils import Metric
 
 
-class LFGPOFlowParams(NamedTuple):
+class DoobPOFlowParams(NamedTuple):
     policy: hk.Params
     value: hk.Params
     ratio: hk.Params
 
 
-class LFGPOFlowParamsWithQ(NamedTuple):
+class DoobPOFlowParamsWithQ(NamedTuple):
     """Policy + V + ratio + twin Q + target policy + log_alpha (off-policy)."""
 
     policy: hk.Params
@@ -49,13 +49,13 @@ class LFGPOFlowParamsWithQ(NamedTuple):
     log_alpha: jax.Array
 
 
-class LFGPOFlowOptStates(NamedTuple):
+class DoobPOFlowOptStates(NamedTuple):
     policy: optax.OptState
     value: optax.OptState
     ratio: optax.OptState
 
 
-class LFGPOFlowOptStatesWithQ(NamedTuple):
+class DoobPOFlowOptStatesWithQ(NamedTuple):
     policy: optax.OptState
     value: optax.OptState
     ratio: optax.OptState
@@ -64,14 +64,14 @@ class LFGPOFlowOptStatesWithQ(NamedTuple):
     log_alpha: optax.OptState
 
 
-class LFGPOFlowTrainState(NamedTuple):
-    params: Union[LFGPOFlowParams, LFGPOFlowParamsWithQ]
-    opt_state: Union[LFGPOFlowOptStates, LFGPOFlowOptStatesWithQ]
+class DoobPOFlowTrainState(NamedTuple):
+    params: Union[DoobPOFlowParams, DoobPOFlowParamsWithQ]
+    opt_state: Union[DoobPOFlowOptStates, DoobPOFlowOptStatesWithQ]
     step: int
 
 
-class LFGPOFlow(Algorithm):
-    """Flow LFGPO: on-policy (GAE) or off-policy (twin Q + replay)."""
+class DoobPOFlow(Algorithm):
+    """Flow DoobPO: on-policy (GAE) or off-policy (twin Q + replay)."""
 
     def __init__(
         self,
@@ -173,7 +173,7 @@ class LFGPOFlow(Algorithm):
                 for x in (q1_params, q2_params, target_q1_params, target_q2_params)
             )
             log_alpha_init = jnp.float32(math.log(5))
-            lfgpo_params = LFGPOFlowParamsWithQ(
+            doobpo_params = DoobPOFlowParamsWithQ(
                 policy=params.policy,
                 value=params.value,
                 ratio=ratio_params,
@@ -184,30 +184,30 @@ class LFGPOFlow(Algorithm):
                 target_policy=params.policy,
                 log_alpha=log_alpha_init,
             )
-            self.state = LFGPOFlowTrainState(
-                params=lfgpo_params,
-                opt_state=LFGPOFlowOptStatesWithQ(
-                    policy=self.policy_optim.init(lfgpo_params.policy),
-                    value=self.value_optim.init(lfgpo_params.value),
-                    ratio=self.ratio_optim.init(lfgpo_params.ratio),
-                    q1=self.q_optim.init(lfgpo_params.q1),
-                    q2=self.q_optim.init(lfgpo_params.q2),
+            self.state = DoobPOFlowTrainState(
+                params=doobpo_params,
+                opt_state=DoobPOFlowOptStatesWithQ(
+                    policy=self.policy_optim.init(doobpo_params.policy),
+                    value=self.value_optim.init(doobpo_params.value),
+                    ratio=self.ratio_optim.init(doobpo_params.ratio),
+                    q1=self.q_optim.init(doobpo_params.q1),
+                    q2=self.q_optim.init(doobpo_params.q2),
                     log_alpha=self.alpha_optim.init(log_alpha_init),
                 ),
                 step=jnp.int32(0),
             )
         else:
-            lfgpo_params = LFGPOFlowParams(
+            doobpo_params = DoobPOFlowParams(
                 policy=params.policy,
                 value=params.value,
                 ratio=ratio_params,
             )
-            self.state = LFGPOFlowTrainState(
-                params=lfgpo_params,
-                opt_state=LFGPOFlowOptStates(
-                    policy=self.policy_optim.init(lfgpo_params.policy),
-                    value=self.value_optim.init(lfgpo_params.value),
-                    ratio=self.ratio_optim.init(lfgpo_params.ratio),
+            self.state = DoobPOFlowTrainState(
+                params=doobpo_params,
+                opt_state=DoobPOFlowOptStates(
+                    policy=self.policy_optim.init(doobpo_params.policy),
+                    value=self.value_optim.init(doobpo_params.value),
+                    ratio=self.ratio_optim.init(doobpo_params.ratio),
                 ),
                 step=jnp.int32(0),
             )
@@ -226,11 +226,11 @@ class LFGPOFlow(Algorithm):
         # ---- On-policy (GAE) update (wrapped with jax.jit below) ----
         def stateless_update_on(
             key: jax.Array,
-            state: LFGPOFlowTrainState,
+            state: DoobPOFlowTrainState,
             data: GAEExperience,
             old_values: jax.Array,
             old_policy_params: hk.Params,
-        ) -> Tuple[LFGPOFlowTrainState, Metric]:
+        ) -> Tuple[DoobPOFlowTrainState, Metric]:
             obs = data.obs
             action = data.action
             adv = data.adv
@@ -322,9 +322,9 @@ class LFGPOFlow(Algorithm):
                 p_updates, p_os = self.policy_optim.update(p_grads, p_os)
                 pp = optax.apply_updates(pp, p_updates)
 
-            new_state = LFGPOFlowTrainState(
-                params=LFGPOFlowParams(pp, vp, rp_new),
-                opt_state=LFGPOFlowOptStates(p_os, v_os, r_os),
+            new_state = DoobPOFlowTrainState(
+                params=DoobPOFlowParams(pp, vp, rp_new),
+                opt_state=DoobPOFlowOptStates(p_os, v_os, r_os),
                 step=step + 1,
             )
             info = {
@@ -342,7 +342,7 @@ class LFGPOFlow(Algorithm):
         # Per replay minibatch: exactly _n_r full Adam steps on ratio params, then _n_p on policy.
         # (_n_r,_n_p) == (ratio_updates_per_batch, policy_updates_per_batch) from __init__.
         # Twin Q each get one Adam step per batch (not counted in the "ratio:policy" label).
-        # Target Q Polyak step matches diffusion LFGPO: only when step % delay_q_target_update == 0.
+        # Target Q Polyak step matches diffusion DoobPO: only when step % delay_q_target_update == 0.
         q_apply = self.q_apply
         _gamma = gamma
         _tau = tau
@@ -358,9 +358,9 @@ class LFGPOFlow(Algorithm):
 
         def stateless_update_off(
             key: jax.Array,
-            state: LFGPOFlowTrainState,
+            state: DoobPOFlowTrainState,
             data: Experience,
-        ) -> Tuple[LFGPOFlowTrainState, Metric]:
+        ) -> Tuple[DoobPOFlowTrainState, Metric]:
             obs, action, reward, next_obs, done = (
                 data.obs,
                 data.action,
@@ -531,11 +531,11 @@ class LFGPOFlow(Algorithm):
                 lambda: (log_alpha, la_os),
             )
 
-            new_state = LFGPOFlowTrainState(
-                params=LFGPOFlowParamsWithQ(
+            new_state = DoobPOFlowTrainState(
+                params=DoobPOFlowParamsWithQ(
                     pp_new, p.value, rp_new, q1p, q2p, tq1, tq2, tp, la_new
                 ),
-                opt_state=LFGPOFlowOptStatesWithQ(
+                opt_state=DoobPOFlowOptStatesWithQ(
                     p_os_new, state.opt_state.value, r_os, q1_os, q2_os, la_os_new
                 ),
                 step=step + 1,

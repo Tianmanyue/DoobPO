@@ -26,18 +26,18 @@ from relax.algorithm.qvpo import QVPO
 from relax.algorithm.sdac import SDAC
 from relax.algorithm.dpmd import DPMD
 from relax.algorithm.idem import IDEM
-from relax.algorithm.lfgpo import LFGPO
-from relax.algorithm.lfgpo_grpo import LFGPOGRPO
-from relax.algorithm.lfgpo_flow import LFGPOFlow
-from relax.algorithm.lfgpo_flow_grpo import LFGPOFlowGRPO
+from relax.algorithm.doobpo import DoobPO
+from relax.algorithm.doobpo_grpo import DoobPOGRPO
+from relax.algorithm.doobpo_flow import DoobPOFlow
+from relax.algorithm.doobpo_flow_grpo import DoobPOFlowGRPO
 from relax.algorithm.fpmd import FPMD
 from relax.algorithm.fpo_flow import FPOFlow
 from relax.algorithm.reinflow import ReinFlow
 from relax.algorithm.pirl import PiRL
 import haiku as hk
 from relax.network.blocks import QNet
-from relax.network.lfgpo import create_lfgpo_net
-from relax.network.lfgpo_flow import create_lfgpo_flow_net
+from relax.network.doobpo import create_doobpo_net
+from relax.network.doobpo_flow import create_doobpo_flow_net
 from relax.network.flow_ppo import create_flow_ppo_net
 from relax.network.reinflow import create_explore_noise_net
 from relax.buffer import TreeBuffer
@@ -83,20 +83,20 @@ if __name__ == "__main__":
     # Trainer
     parser.add_argument("--batch_size", type=int, default=256)
     parser.add_argument("--utd", type=int, default=1, help="update-to-data ratio (update_per_iteration)")
-    # LFGPO-specific
+    # DoobPO-specific
     parser.add_argument("--ppo_eps", type=float, default=0.2)
     parser.add_argument("--ratio_lr", type=float, default=3e-4)
     parser.add_argument("--reward_scale", type=float, default=0.2)
     parser.add_argument("--max_ratio_weight", type=float, default=5.0)
     parser.add_argument("--ratio_regularizer_lambda", type=float, default=0.01,
-                        help="LFGPO: λ for ratio network regularizer -λ (E[r_β] - 1)^2")
+                        help="DoobPO: λ for ratio network regularizer -λ (E[r_β] - 1)^2")
     parser.add_argument("--lr_schedule_steps", type=int, default=50000,
                         help="gradient steps over which policy lr decays from lr to lr_schedule_end")
     parser.add_argument("--n_epochs", type=int, default=4,
                         help="PPO epochs per rollout batch (on-policy flow baselines only)")
-    # LFGPO-GRPO (diffusion)
+    # DoobPO-GRPO (diffusion)
     parser.add_argument("--grpo_group_size", type=int, default=8,
-                        help="LFGPO-GRPO: number of action samples per state for group-relative advantage")
+                        help="DoobPO-GRPO: number of action samples per state for group-relative advantage")
     # ---- Flow-matching methods (all _flow suffix, won't conflict with diffusion args) ----
     parser.add_argument("--flow_steps", type=int, default=20,
                         help="Flow: ODE Euler integration steps")
@@ -116,54 +116,54 @@ if __name__ == "__main__":
                         help="Flow: exploration noise scale")
     parser.add_argument("--gamma_flow", type=float, default=0.99,
                         help="Flow: discount factor (unified: 0.99)")
-    # LFGPO-Flow specific
+    # DoobPO-Flow specific
     parser.add_argument("--ratio_lr_flow", type=float, default=3e-4,
-                        help="LFGPO-Flow: ratio network learning rate")
+                        help="DoobPO-Flow: ratio network learning rate")
     parser.add_argument("--max_ratio_weight_flow", type=float, default=5.0,
-                        help="LFGPO-Flow: max ratio clipping for drift matching")
+                        help="DoobPO-Flow: max ratio clipping for drift matching")
     parser.add_argument("--ratio_regularizer_lambda_flow", type=float, default=0.01,
-                        help="LFGPO-Flow: ratio regularizer lambda")
+                        help="DoobPO-Flow: ratio regularizer lambda")
     parser.add_argument("--ratio_updates_per_batch_flow", type=int, default=1,
-                        help="LFGPO-Flow: ratio-net gradient steps per replay batch (off-policy; vs policy_updates_per_batch_flow)")
+                        help="DoobPO-Flow: ratio-net gradient steps per replay batch (off-policy; vs policy_updates_per_batch_flow)")
     parser.add_argument("--policy_updates_per_batch_flow", type=int, default=1,
-                        help="LFGPO-Flow: policy (flow) gradient steps per replay batch (off-policy)")
+                        help="DoobPO-Flow: policy (flow) gradient steps per replay batch (off-policy)")
     parser.add_argument("--delay_q_target_update_flow", type=int, default=2,
-                        help="LFGPO-Flow off-policy: Polyak-update target Q1/Q2 every N algorithm steps "
-                             "(same idea as diffusion LFGPO delay_update for targets; 1=every step)")
+                        help="DoobPO-Flow off-policy: Polyak-update target Q1/Q2 every N algorithm steps "
+                             "(same idea as diffusion DoobPO delay_update for targets; 1=every step)")
     parser.add_argument("--alpha_lr_flow", type=float, default=7e-3,
-                        help="LFGPO-Flow: alpha (entropy temperature) learning rate")
+                        help="DoobPO-Flow: alpha (entropy temperature) learning rate")
     parser.add_argument("--delay_alpha_update_flow", type=int, default=250,
-                        help="LFGPO-Flow: update alpha every N algorithm steps")
+                        help="DoobPO-Flow: update alpha every N algorithm steps")
     parser.add_argument("--target_entropy_scale_flow", type=float, default=0.9,
-                        help="LFGPO-Flow: target_entropy = -act_dim * scale")
-    # LFGPO-Flow-GRPO specific
+                        help="DoobPO-Flow: target_entropy = -act_dim * scale")
+    # DoobPO-Flow-GRPO specific
     parser.add_argument("--num_grpo_samples", type=int, default=16,
-                        help="LFGPO-Flow-GRPO: number of actions sampled per state for group-relative advantage")
+                        help="DoobPO-Flow-GRPO: number of actions sampled per state for group-relative advantage")
     parser.add_argument(
         "--ratio_net_type",
         type=str,
         default="mlp",
         choices=("mlp", "resnet"),
-        help="LFGPO-Flow / GRPO-Flow: ratio backbone (mlp | resnet residual trunk).",
+        help="DoobPO-Flow / GRPO-Flow: ratio backbone (mlp | resnet residual trunk).",
     )
     parser.add_argument(
         "--ratio_mlp_hidden_sizes",
         type=str,
         default="",
-        help="LFGPO-Flow: comma-separated MLP ratio hidden widths (e.g. 256,256,256). "
+        help="DoobPO-Flow: comma-separated MLP ratio hidden widths (e.g. 256,256,256). "
              "Empty: use value net widths [hidden_dim]*hidden_num.",
     )
     parser.add_argument(
         "--ratio_resnet_hidden_dim",
         type=int,
         default=256,
-        help="LFGPO-Flow: ResNet ratio trunk width (all ResBlocks use this dim).",
+        help="DoobPO-Flow: ResNet ratio trunk width (all ResBlocks use this dim).",
     )
     parser.add_argument(
         "--ratio_resnet_num_blocks",
         type=int,
         default=1,
-        help="LFGPO-Flow: number of residual blocks (1 block ≈ param budget of MLP 256×3).",
+        help="DoobPO-Flow: number of residual blocks (1 block ≈ param budget of MLP 256×3).",
     )
     # FPO-Flow specific
     parser.add_argument("--n_cfm_samples_flow", type=int, default=8,
@@ -218,7 +218,7 @@ if __name__ == "__main__":
     parser.add_argument("--grpo_batch_norm_adv", action="store_true",
                         help="GRPO: use batch-level advantage normalization instead of per-state group normalization")
     parser.add_argument("--reinflow_legacy_hparams", action="store_true",
-                        help="ReinFlow: use old LFGPO settings (5e-6 actor, target_kl=0.05, no running reward norm, ...). "
+                        help="ReinFlow: use old DoobPO settings (5e-6 actor, target_kl=0.05, no running reward norm, ...). "
                              "Default: official ReinFlow ShortCut yaml per task family (Ant-v4 same as ant-v2, etc.).")
     args = parser.parse_args()
 
@@ -278,10 +278,10 @@ if __name__ == "__main__":
                                           beta_schedule_scale=args.beta_schedule_scale)
         algorithm = DPMD(agent, params, lr=args.lr, alpha_lr=args.alpha_lr, delay_alpha_update=args.delay_alpha_update, lr_schedule_end=args.lr_schedule_end)
 
-    elif args.alg == 'lfgpo':
+    elif args.alg == 'doobpo':
         def mish(x: jax.Array):
             return x * jnp.tanh(jax.nn.softplus(x))
-        agent, params, ratio_net, ratio_params = create_lfgpo_net(
+        agent, params, ratio_net, ratio_params = create_doobpo_net(
             init_network_key, obs_dim, act_dim,
             hidden_sizes, diffusion_hidden_sizes, mish,
             num_timesteps=args.diffusion_steps,
@@ -289,7 +289,7 @@ if __name__ == "__main__":
             noise_scale=args.noise_scale,
             beta_schedule_scale=args.beta_schedule_scale,
         )
-        algorithm = LFGPO(
+        algorithm = DoobPO(
             agent, params, ratio_net, ratio_params,
             lr=args.lr,
             ratio_lr=args.ratio_lr,
@@ -304,10 +304,10 @@ if __name__ == "__main__":
             gae_lambda=0.95,
         )
 
-    elif args.alg == 'lfgpo_grpo':
+    elif args.alg == 'doobpo_grpo':
         def mish(x: jax.Array):
             return x * jnp.tanh(jax.nn.softplus(x))
-        agent, params, ratio_net, ratio_params = create_lfgpo_net(
+        agent, params, ratio_net, ratio_params = create_doobpo_net(
             init_network_key, obs_dim, act_dim,
             hidden_sizes, diffusion_hidden_sizes, mish,
             num_timesteps=args.diffusion_steps,
@@ -315,7 +315,7 @@ if __name__ == "__main__":
             noise_scale=args.noise_scale,
             beta_schedule_scale=args.beta_schedule_scale,
         )
-        algorithm = LFGPOGRPO(
+        algorithm = DoobPOGRPO(
             agent, params, ratio_net, ratio_params,
             lr=args.lr,
             ratio_lr=args.ratio_lr,
@@ -330,7 +330,7 @@ if __name__ == "__main__":
             ppo_eps=args.ppo_eps,
         )
 
-    elif args.alg == 'lfgpo_flow':
+    elif args.alg == 'doobpo_flow':
         def mish(x: jax.Array):
             return x * jnp.tanh(jax.nn.softplus(x))
         (
@@ -343,7 +343,7 @@ if __name__ == "__main__":
             q2_p,
             tq1_p,
             tq2_p,
-        ) = create_lfgpo_flow_net(
+        ) = create_doobpo_flow_net(
             init_network_key, obs_dim, act_dim,
             policy_hidden_sizes=diffusion_hidden_sizes,
             value_hidden_sizes=hidden_sizes,
@@ -356,8 +356,8 @@ if __name__ == "__main__":
             ratio_resnet_hidden_dim=args.ratio_resnet_hidden_dim,
             ratio_resnet_num_blocks=args.ratio_resnet_num_blocks,
         )
-        # Off-policy: match diffusion LFGPO (--alg lfgpo) lr / reward / PPO-ratio hyperparameters.
-        algorithm = LFGPOFlow(
+        # Off-policy: match diffusion DoobPO (--alg doobpo) lr / reward / PPO-ratio hyperparameters.
+        algorithm = DoobPOFlow(
             agent, params, ratio_net, ratio_params,
             lr=args.lr,
             value_lr=args.lr,
@@ -450,7 +450,7 @@ if __name__ == "__main__":
             target_entropy_scale=args.target_entropy_scale_flow,
         )
 
-    elif args.alg == 'lfgpo_flow_grpo':
+    elif args.alg == 'doobpo_flow_grpo':
         def mish(x: jax.Array):
             return x * jnp.tanh(jax.nn.softplus(x))
         (
@@ -463,7 +463,7 @@ if __name__ == "__main__":
             q2_p,
             tq1_p,
             tq2_p,
-        ) = create_lfgpo_flow_net(
+        ) = create_doobpo_flow_net(
             init_network_key, obs_dim, act_dim,
             policy_hidden_sizes=diffusion_hidden_sizes,
             value_hidden_sizes=hidden_sizes,
@@ -476,7 +476,7 @@ if __name__ == "__main__":
             ratio_resnet_hidden_dim=args.ratio_resnet_hidden_dim,
             ratio_resnet_num_blocks=args.ratio_resnet_num_blocks,
         )
-        algorithm = LFGPOFlowGRPO(
+        algorithm = DoobPOFlowGRPO(
             agent, params, ratio_net, ratio_params,
             lr=args.lr,
             value_lr=args.lr,
@@ -612,7 +612,7 @@ if __name__ == "__main__":
                 value_updates_per_batch=10,
                 policy_updates_per_batch=1,
             )
-            print("ReinFlow: using --reinflow_legacy_hparams (old LFGPO defaults).")
+            print("ReinFlow: using --reinflow_legacy_hparams (old DoobPO defaults).")
         else:
             oh = get_task_hparams(REINFLOW_HPARAMS, args.env)
             print(

@@ -1,7 +1,7 @@
 """
-LFGPO-Flow-GRPO: Flow Policy Optimization with Group-Relative Advantage.
+DoobPO-Flow-GRPO: Flow Policy Optimization with Group-Relative Advantage.
 
-Same as LFGPO-Flow (PPO) but replaces the single-sample baseline advantage
+Same as DoobPO-Flow (PPO) but replaces the single-sample baseline advantage
     A(s,a) = Q(s,a) - Q(s, pi(s))
 with a group-relative advantage (GRPO-style):
     sample G actions {a_1,...,a_G} ~ pi(.|s)
@@ -27,13 +27,13 @@ from relax.utils.experience import Experience, GAEExperience
 from relax.utils.typing_utils import Metric
 
 
-class LFGPOFlowGRPOParams(NamedTuple):
+class DoobPOFlowGRPOParams(NamedTuple):
     policy: hk.Params
     value: hk.Params
     ratio: hk.Params
 
 
-class LFGPOFlowGRPOParamsWithQ(NamedTuple):
+class DoobPOFlowGRPOParamsWithQ(NamedTuple):
     policy: hk.Params
     value: hk.Params
     ratio: hk.Params
@@ -45,13 +45,13 @@ class LFGPOFlowGRPOParamsWithQ(NamedTuple):
     log_alpha: jax.Array
 
 
-class LFGPOFlowGRPOOptStates(NamedTuple):
+class DoobPOFlowGRPOOptStates(NamedTuple):
     policy: optax.OptState
     value: optax.OptState
     ratio: optax.OptState
 
 
-class LFGPOFlowGRPOOptStatesWithQ(NamedTuple):
+class DoobPOFlowGRPOOptStatesWithQ(NamedTuple):
     policy: optax.OptState
     value: optax.OptState
     ratio: optax.OptState
@@ -60,14 +60,14 @@ class LFGPOFlowGRPOOptStatesWithQ(NamedTuple):
     log_alpha: optax.OptState
 
 
-class LFGPOFlowGRPOTrainState(NamedTuple):
-    params: Union[LFGPOFlowGRPOParams, LFGPOFlowGRPOParamsWithQ]
-    opt_state: Union[LFGPOFlowGRPOOptStates, LFGPOFlowGRPOOptStatesWithQ]
+class DoobPOFlowGRPOTrainState(NamedTuple):
+    params: Union[DoobPOFlowGRPOParams, DoobPOFlowGRPOParamsWithQ]
+    opt_state: Union[DoobPOFlowGRPOOptStates, DoobPOFlowGRPOOptStatesWithQ]
     step: int
 
 
-class LFGPOFlowGRPO(Algorithm):
-    """Flow LFGPO with GRPO-style group-relative advantage."""
+class DoobPOFlowGRPO(Algorithm):
+    """Flow DoobPO with GRPO-style group-relative advantage."""
 
     def __init__(
         self,
@@ -172,7 +172,7 @@ class LFGPOFlowGRPO(Algorithm):
                 for x in (q1_params, q2_params, target_q1_params, target_q2_params)
             )
             log_alpha_init = jnp.float32(math.log(5))
-            grpo_params = LFGPOFlowGRPOParamsWithQ(
+            grpo_params = DoobPOFlowGRPOParamsWithQ(
                 policy=params.policy,
                 value=params.value,
                 ratio=ratio_params,
@@ -183,9 +183,9 @@ class LFGPOFlowGRPO(Algorithm):
                 target_policy=params.policy,
                 log_alpha=log_alpha_init,
             )
-            self.state = LFGPOFlowGRPOTrainState(
+            self.state = DoobPOFlowGRPOTrainState(
                 params=grpo_params,
-                opt_state=LFGPOFlowGRPOOptStatesWithQ(
+                opt_state=DoobPOFlowGRPOOptStatesWithQ(
                     policy=self.policy_optim.init(grpo_params.policy),
                     value=self.value_optim.init(grpo_params.value),
                     ratio=self.ratio_optim.init(grpo_params.ratio),
@@ -196,14 +196,14 @@ class LFGPOFlowGRPO(Algorithm):
                 step=jnp.int32(0),
             )
         else:
-            grpo_params = LFGPOFlowGRPOParams(
+            grpo_params = DoobPOFlowGRPOParams(
                 policy=params.policy,
                 value=params.value,
                 ratio=ratio_params,
             )
-            self.state = LFGPOFlowGRPOTrainState(
+            self.state = DoobPOFlowGRPOTrainState(
                 params=grpo_params,
-                opt_state=LFGPOFlowGRPOOptStates(
+                opt_state=DoobPOFlowGRPOOptStates(
                     policy=self.policy_optim.init(grpo_params.policy),
                     value=self.value_optim.init(grpo_params.value),
                     ratio=self.ratio_optim.init(grpo_params.ratio),
@@ -228,11 +228,11 @@ class LFGPOFlowGRPO(Algorithm):
         # by sampling G actions per state and comparing.
         def stateless_update_on(
             key: jax.Array,
-            state: LFGPOFlowGRPOTrainState,
+            state: DoobPOFlowGRPOTrainState,
             data: GAEExperience,
             old_values: jax.Array,
             old_policy_params: hk.Params,
-        ) -> Tuple[LFGPOFlowGRPOTrainState, Metric]:
+        ) -> Tuple[DoobPOFlowGRPOTrainState, Metric]:
             obs = data.obs
             action = data.action
             adv = data.adv
@@ -326,9 +326,9 @@ class LFGPOFlowGRPO(Algorithm):
                 p_updates, p_os = self.policy_optim.update(p_grads, p_os)
                 pp = optax.apply_updates(pp, p_updates)
 
-            new_state = LFGPOFlowGRPOTrainState(
-                params=LFGPOFlowGRPOParams(pp, vp, rp_new),
-                opt_state=LFGPOFlowGRPOOptStates(p_os, v_os, r_os),
+            new_state = DoobPOFlowGRPOTrainState(
+                params=DoobPOFlowGRPOParams(pp, vp, rp_new),
+                opt_state=DoobPOFlowGRPOOptStates(p_os, v_os, r_os),
                 step=step + 1,
             )
             info = {
@@ -359,9 +359,9 @@ class LFGPOFlowGRPO(Algorithm):
 
         def stateless_update_off(
             key: jax.Array,
-            state: LFGPOFlowGRPOTrainState,
+            state: DoobPOFlowGRPOTrainState,
             data: Experience,
-        ) -> Tuple[LFGPOFlowGRPOTrainState, Metric]:
+        ) -> Tuple[DoobPOFlowGRPOTrainState, Metric]:
             obs, action, reward, next_obs, done = (
                 data.obs,
                 data.action,
@@ -452,7 +452,7 @@ class LFGPOFlowGRPO(Algorithm):
             )
             adv_sg = jax.lax.stop_gradient(adv)
 
-            # --- Ratio update (PPO clipped, same as LFGPO-Flow) ---
+            # --- Ratio update (PPO clipped, same as DoobPO-Flow) ---
             rp_new = rp
             ratio_loss_val = 0.0
             r_beta_val = self.ratio_net.apply(rp_new, obs, action)
@@ -477,7 +477,7 @@ class LFGPOFlowGRPO(Algorithm):
                 r_updates, r_os = self.ratio_optim.update(ratio_grads, r_os)
                 rp_new = optax.apply_updates(rp_new, r_updates)
 
-            # --- Policy update (velocity matching, same as LFGPO-Flow) ---
+            # --- Policy update (velocity matching, same as DoobPO-Flow) ---
             def policy_loss_fn(pp_):
                 r_raw = jax.lax.stop_gradient(
                     self.ratio_net.apply(rp_new, obs, action)
@@ -546,11 +546,11 @@ class LFGPOFlowGRPO(Algorithm):
                 lambda: (log_alpha, la_os),
             )
 
-            new_state = LFGPOFlowGRPOTrainState(
-                params=LFGPOFlowGRPOParamsWithQ(
+            new_state = DoobPOFlowGRPOTrainState(
+                params=DoobPOFlowGRPOParamsWithQ(
                     pp_new, p.value, rp_new, q1p, q2p, tq1, tq2, tp, la_new
                 ),
-                opt_state=LFGPOFlowGRPOOptStatesWithQ(
+                opt_state=DoobPOFlowGRPOOptStatesWithQ(
                     p_os_new, state.opt_state.value, r_os, q1_os, q2_os, la_os_new
                 ),
                 step=step + 1,

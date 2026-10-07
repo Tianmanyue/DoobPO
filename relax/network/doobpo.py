@@ -1,5 +1,5 @@
 """
-Network factory for LFGPO.
+Network factory for DoobPO.
 
 Re-uses the existing Diffv2Net (diffusion policy + Q-networks) and adds a
 lightweight ratio network r_β: (obs, act) → ℝ₊.
@@ -87,7 +87,7 @@ def create_ratio_net_resnet(
     return ratio_net, ratio_params
 
 
-def create_lfgpo_net(
+def create_doobpo_net(
     key: jax.Array,
     obs_dim: int,
     act_dim: int,
@@ -103,7 +103,7 @@ def create_lfgpo_net(
     ratio_hidden_sizes: Optional[Sequence[int]] = None,
 ) -> Tuple[Diffv2Net, Diffv2Params, hk.Transformed, hk.Params]:
     """
-    Create all networks needed for LFGPO.
+    Create all networks needed for DoobPO.
 
     Returns
     -------
