@@ -25,7 +25,7 @@ the relation between this tractable objective and ideal drift matching for
 both policy classes. See the manuscript for the precise statements and
 assumptions.
 
-> Manuscript (2026). Public paper link forthcoming.
+> NIPS 2026. Public paper link forthcoming.
 >
 > **Project page:** https://tianmanyue.github.io/LFGPO
 
@@ -141,6 +141,6 @@ scripts/train_mujoco.py      single training entry point
   author = {Su, Maojiang and Zhu, Qijie and Xiao, Yu and Yu, Shuyang and Chen, Minshuo and Wang, Zhaoran and Liu, Han},
   title  = {Doob-Based Generative Policy Optimization},
   year   = {2026},
-  note   = {NeurIPS 2026 manuscript},
+  note   = {NIPS 2026},
 }
 ```
