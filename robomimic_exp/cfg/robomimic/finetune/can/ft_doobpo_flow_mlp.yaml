@@ -1,0 +1,125 @@
+defaults:
+  - _self_
+hydra:
+  run:
+    dir: ${logdir}
+_target_: agent.finetune.doobpo.train_doobpo_flow_agent.TrainDoobPOFlowAgent
+
+name: ${env_name}_doobpo_flow_mlp_ta${horizon_steps}_td${denoising_steps}
+logdir: ${oc.env:REINFLOW_LOG_DIR}/robomimic/finetune/${name}/${now:%Y-%m-%d}_${now:%H-%M-%S}_${seed}
+base_policy_path: pretrained/flow_bc/can_reflow_state50.pt
+robomimic_env_cfg_path: cfg/robomimic/env_meta/${env_name}.json
+normalization_path: ${oc.env:DPPO_DATA_DIR}/robomimic/${env_name}/normalization.npz
+
+seed: 42
+device: cuda:0
+env_name: can
+obs_dim: 23
+action_dim: 7
+denoising_steps: 4          # flow inference steps
+cond_steps: 1
+horizon_steps: 4
+act_steps: 4
+
+env:
+  n_envs: 50
+  name: ${env_name}
+  best_reward_threshold_for_success: 1
+  max_episode_steps: 300
+  save_video: false
+  wrappers:
+    robomimic_lowdim:
+      normalization_path: ${normalization_path}
+      low_dim_keys: ['robot0_eef_pos',
+                    'robot0_eef_quat',
+                    'robot0_gripper_qpos',
+                    'object']
+    multi_step:
+      n_obs_steps: ${cond_steps}
+      n_action_steps: ${act_steps}
+      max_episode_steps: ${env.max_episode_steps}
+      reset_within_step: true
+
+wandb:
+  entity: ${oc.env:DPPO_WANDB_ENTITY}
+  project: robomimic-${env_name}-finetune
+  run: ${now:%H-%M-%S}_${name}
+
+train:
+  n_train_itr: 151
+  n_critic_warmup_itr: 5
+  n_steps: 300
+  gamma: 0.999
+  actor_lr: 1e-5
+  actor_weight_decay: 0
+  actor_lr_scheduler:
+    first_cycle_steps: 1000
+    warmup_steps: 10
+    min_lr: 3e-6
+  critic_lr: 3e-4
+  critic_weight_decay: 0
+  critic_lr_scheduler:
+    first_cycle_steps: 1000
+    warmup_steps: 10
+    min_lr: 3e-4
+  ratio_lr: 3e-4
+  ratio_weight_decay: 0
+  save_model_freq: 100
+  val_freq: 8
+  render:
+    freq: 1
+    num: 0
+  scale_reward_factor: 1
+  critic_tau: 0.005
+  policy_tau: 0.005
+  buffer_size: 5000
+  replay_ratio: 16
+  batch_size: 1000
+  ratio_updates_per_batch: 1
+
+model:
+  _target_: model.flow.ft_doobpo.doobpo_flow.DoobPOFlow
+  ppo_eps: 0.2
+  max_ratio_weight: 5.0
+  ratio_reg_lambda: 0.01
+  num_grpo_samples: 32
+  grpo_batch_norm_adv: false
+  advantage_mode: grpo
+  adv_norm: true
+  use_target_policy: true
+  act_min: -1
+  act_max: 1
+  obs_dim: ${obs_dim}
+  horizon_steps: ${horizon_steps}
+  action_dim: ${action_dim}
+  max_denoising_steps: ${denoising_steps}
+  inference_steps: ${denoising_steps}
+  seed: ${seed}
+  sample_t_type: uniform
+  device: ${device}
+  network_path: ${base_policy_path}
+  network:
+    _target_: model.flow.mlp_flow.FlowMLP
+    horizon_steps: ${horizon_steps}
+    action_dim: ${action_dim}
+    cond_dim: ${eval:'${obs_dim} * ${cond_steps}'}
+    time_dim: 32
+    mlp_dims: [1024, 1024, 1024]
+    activation_type: ReLU
+    out_activation_type: Identity
+    residual_style: true
+  critic:
+    _target_: model.common.critic.CriticObsAct
+    action_dim: ${action_dim}
+    action_steps: ${act_steps}
+    cond_dim: ${eval:'${obs_dim} * ${cond_steps}'}
+    mlp_dims: [256, 256, 256]
+    activation_type: Mish
+    residual_style: true
+  ratio_net:
+    _target_: model.diffusion.diffusion_doobpo.RatioNet
+    obs_dim: ${obs_dim}
+    action_dim: ${action_dim}
+    cond_steps: ${cond_steps}
+    horizon_steps: ${horizon_steps}
+    hidden_sizes: [256, 256, 256]

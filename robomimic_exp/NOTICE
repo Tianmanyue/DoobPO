@@ -1,0 +1,9 @@
+This directory contains code derived from the following open-source projects.
+Their original copyright and license notices are preserved in the file headers
+and in the LICENSE file of this directory (MIT).
+
+  ReinFlow   https://github.com/ReinFlow/ReinFlow        (c) ReinFlow Authors, MIT License
+  DPPO       https://github.com/irom-lab/dppo             (c) 2024 Intelligent Robot Motion Lab, MIT License
+  Robomimic  https://github.com/ARISE-Initiative/robomimic
+
+The DoobPO agents, models and configs added on top are listed in README.md.

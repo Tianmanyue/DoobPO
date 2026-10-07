@@ -28,3 +28,7 @@ wandb/
 
 # Project page (GitHub Pages serves docs/)
 !docs/**
+
+# Robomimic experiments: keep the env script, ignore runtime outputs
+!robomimic_exp/set_env.sh
+robomimic_exp/runtime/

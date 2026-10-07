@@ -117,6 +117,13 @@ paper but kept for reference: `sac`, `dsact`, `dacer_doubleq`, `qsm`,
 
 ---
 
+## Robomimic experiments
+
+The Robomimic manipulation experiments (Can and Square, DoobPPO vs DPPO) are in a separate PyTorch
+codebase with its own environment: see [`robomimic_exp/`](robomimic_exp/README.md).
+
+---
+
 ## Layout
 
 ```
@@ -129,6 +136,7 @@ relax/                       core package
 └── utils/                   diffusion / flow-matching schedulers, RNG, …
 src/                         C extensions (futex, spinlock, prctl)
 scripts/train_mujoco.py      single training entry point
+robomimic_exp/               Robomimic experiments (PyTorch, separate environment)
 ```
 
 ---
