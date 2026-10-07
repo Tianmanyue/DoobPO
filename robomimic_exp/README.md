@@ -27,6 +27,10 @@ All experiments are **state-based** (low-dimensional observations). The metric i
 
 ## 1. Installation
 
+Requires Linux and an NVIDIA GPU (the commands below install PyTorch for CUDA 12.1). Datasets and
+pretrained checkpoints are downloaded from Google Drive on the first run via `gdown`, so internet access
+is needed.
+
 ```bash
 conda create --name doobpo_robomimic python=3.8 -y && conda activate doobpo_robomimic
 pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
@@ -75,8 +79,9 @@ Flow policies need a state BC checkpoint. Pretrain it first (rectified-flow BC, 
 python script/run.py --config-dir=cfg/robomimic/pretrain/can --config-name=pre_reflow_mlp device=cuda:0
 ```
 
-This writes `.../<env>_pre_reflow_mlp_ta*_td100/<TIMESTAMP>_42/checkpoint/state_50.pt`. Copy it to
-`pretrained/flow_bc/can_reflow_state50.pt` (the path the flow configs expect), or point `base_policy_path`
+This writes `.../<env>_pre_reflow_mlp_ta*_td100/<TIMESTAMP>_42/checkpoint/state_50.pt`. Create the folder
+with `mkdir -p pretrained/flow_bc` and copy the file to `pretrained/flow_bc/can_reflow_state50.pt` (the path
+the flow configs expect), or point `base_policy_path`
 in `cfg/robomimic/finetune/can/{ft_doobpo_flow_mlp,ft_ppo_reflow_mlp}.yaml` at it. Then:
 
 ```bash
@@ -96,17 +101,11 @@ training procedure itself is fully specified by the configs.
 
 ---
 
-## 3. What DoobPO adds on top of ReinFlow
+## 3. Code origin
 
-- `model/diffusion/diffusion_doobpo.py`: `RatioNet` and `DoobPODiffusion` (off-policy; twin-Q critic,
-  PPO-clipped ratio network, ratio-reweighted score / drift matching). Port of `../relax/algorithm/doobpo.py`.
-- `model/flow/ft_doobpo/doobpo_flow.py`: `DoobPOFlow` (off-policy; twin-Q critic, GRPO group-relative
-  advantage, ratio-reweighted velocity matching). Port of `../relax/algorithm/doobpo_flow_grpo.py`.
-- `agent/finetune/doobpo/`: the DoobPO training agents.
-- `cfg/robomimic/finetune/{can,square,transport}/ft_doobpo_*.yaml`: DoobPO configs.
-
-Everything else (environment wrappers, DPPO and ReinFlow agents, BC pretraining, utilities) comes from the
-upstream projects and is kept as is, apart from trimming to what these experiments need.
+This directory is ReinFlow / DPPO code plus the DoobPO additions: `model/diffusion/diffusion_doobpo.py`,
+`model/flow/ft_doobpo/`, `agent/finetune/doobpo/` and the `ft_doobpo_*.yaml` configs. Everything else comes
+from the upstream projects, trimmed to what these experiments need.
 
 ## Acknowledgements
 

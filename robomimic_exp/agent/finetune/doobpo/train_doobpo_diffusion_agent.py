@@ -271,9 +271,11 @@ class TrainDoobPODiffusionAgent(TrainAgent):
                                 self.model.actor.parameters(),
                                 self.max_grad_norm if self.max_grad_norm is not None else float("inf"),
                             )
-                            self.model.last_diagnostics["actor_grad_norm"] = float(
-                                actor_grad_norm.detach()
-                            )
+                            diagnostics = getattr(self.model, "last_diagnostics", None)
+                            if diagnostics is not None:
+                                diagnostics["actor_grad_norm"] = float(
+                                    actor_grad_norm.detach()
+                                )
                             self.actor_optimizer.step()
 
                     # 5. Polyak target updates

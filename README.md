@@ -52,7 +52,9 @@ pip install -e .
 ```
 
 `pip install -e .` builds the small C extensions in `src/` (futex, spinlock,
-prctl) used by the vectorised env workers.
+prctl) used by the vectorised env workers. It reads `$CONDA_PREFIX`, so run it
+inside the activated conda environment, and a C compiler (`gcc`) must be
+available.
 
 ## Quickstart
 
@@ -69,7 +71,9 @@ The historical `doobpo` flag runs DoobPPO with a diffusion policy; CLI flags
 are retained for reproducibility.
 
 Logs (TensorBoard + wandb + final eval CSV) land in
-`logs/<env>/<alg>_<timestamp>_s<seed>_<suffix>/`.
+`logs/<env>/<alg>_<timestamp>_s<seed>_<suffix>/`. Training calls `wandb.init`,
+so either run `wandb login` first or prefix the command with
+`WANDB_MODE=disabled` (or `offline`) to run without a wandb account.
 
 Hyperparameters used in the paper are the script's argparse defaults; for
 per-task tuned hyperparameters of the on-policy flow baselines (`fpo_flow`,
@@ -121,23 +125,6 @@ paper but kept for reference: `sac`, `dsact`, `dacer_doubleq`, `qsm`,
 
 The Robomimic manipulation experiments (Can and Square, DoobPPO vs DPPO) are in a separate PyTorch
 codebase with its own environment: see [`robomimic_exp/`](robomimic_exp/README.md).
-
----
-
-## Layout
-
-```
-relax/                       core package
-├── algorithm/               algorithms (one file per --alg)
-├── network/                 network factories (Diffv2, FlowPPO, …)
-├── trainer/                 OffPolicyTrainer / OnPolicyTrainer + evaluator subprocess
-├── buffer/                  TreeBuffer (replay)
-├── env/                     vectorised env workers (futex IPC)
-└── utils/                   diffusion / flow-matching schedulers, RNG, …
-src/                         C extensions (futex, spinlock, prctl)
-scripts/train_mujoco.py      single training entry point
-robomimic_exp/               Robomimic experiments (PyTorch, separate environment)
-```
 
 ---
 
