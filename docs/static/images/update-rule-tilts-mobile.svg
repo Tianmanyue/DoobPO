@@ -10,7 +10,7 @@
   <!-- Shared base. -->
   <rect x="72.5" y="18.5" width="387" height="145" rx="4" fill="#fff" stroke="#dce3ea"/>
   <text x="96" y="47" fill="#222b36" font-family="Noto Sans, Arial, sans-serif" font-size="19" font-weight="600">Reference policy</text>
-  <text x="96" y="66" fill="#687684" font-family="Noto Sans, Arial, sans-serif" font-size="16">π<tspan baseline-shift="sub" font-size="11">old</tspan><tspan> (a | o)</tspan></text>
+  <text x="96" y="70" fill="#30343b" font-family="Cambria Math, Cambria, Times New Roman, serif" font-size="19" font-style="italic">π<tspan baseline-shift="sub" font-size="13" font-style="normal">old</tspan><tspan> (a | o)</tspan></text>
   <path d="M 95 142 H 438" stroke="#b7c2cc" stroke-width="1"/>
   <path d="M 95 142 C 139 142 166 139 191 120 C 210 102 223 85 247 84 C 271 83 285 110 303 126 C 325 141 357 142 438 142 L 95 142 Z" fill="#eef1f4"/>
   <path d="M 95 142 C 139 142 166 139 191 120 C 210 102 223 85 247 84 C 271 83 285 110 303 126 C 325 141 357 142 438 142" fill="none" stroke="#677889" stroke-width="2.4" stroke-linecap="round"/>
@@ -24,7 +24,7 @@
   <!-- PPO target and the same reference distribution. -->
   <rect x="72.5" y="207.5" width="387" height="150" rx="4" fill="#fff" stroke="#dce3ea"/>
   <text x="96" y="235" fill="#222b36" font-family="Noto Sans, Arial, sans-serif" font-size="19" font-weight="600">PPO tilt</text>
-  <text x="365" y="234" fill="#3273dc" font-family="Noto Sans, Arial, sans-serif" font-size="16" font-weight="600">r<tspan baseline-shift="sub" font-size="11">PPO</tspan><tspan> &gt; 0</tspan></text>
+  <text x="365" y="236" fill="#1b54b4" font-family="Cambria, Times New Roman, serif" font-size="19" font-style="italic" font-weight="700">r<tspan baseline-shift="sub" font-size="13" font-style="normal">PPO</tspan><tspan> &gt; 0</tspan></text>
   <path d="M 95 336 H 438" stroke="#b7c2cc" stroke-width="1"/>
   <path d="M 95 336 C 139 336 166 333 191 314 C 210 296 223 279 247 278 C 271 277 285 304 303 320 C 325 335 357 336 438 336" fill="none" stroke="#a7b2bd" stroke-width="1.8" stroke-dasharray="5 5" stroke-linecap="round"/>
   <path d="M 95 336 C 159 336 196 332 223 316 C 243 300 256 279 289 278 C 315 277 330 306 350 323 C 372 335 403 336 438 336 L 95 336 Z" fill="#3273dc" fill-opacity="0.09"/>
@@ -34,7 +34,7 @@
   <!-- GRPO target and the identical dashed reference distribution. -->
   <rect x="72.5" y="381.5" width="387" height="150" rx="4" fill="#fff" stroke="#dce3ea"/>
   <text x="96" y="409" fill="#222b36" font-family="Noto Sans, Arial, sans-serif" font-size="19" font-weight="600">GRPO tilt</text>
-  <text x="356" y="408" fill="#2b9697" font-family="Noto Sans, Arial, sans-serif" font-size="16" font-weight="600">r<tspan baseline-shift="sub" font-size="11">GRPO</tspan><tspan> &gt; 0</tspan></text>
+  <text x="356" y="410" fill="#147879" font-family="Cambria, Times New Roman, serif" font-size="19" font-style="italic" font-weight="700">r<tspan baseline-shift="sub" font-size="13" font-style="normal">GRPO</tspan><tspan> &gt; 0</tspan></text>
   <path d="M 95 510 H 438" stroke="#b7c2cc" stroke-width="1"/>
   <path d="M 95 510 C 139 510 166 507 191 488 C 210 470 223 453 247 452 C 271 451 285 478 303 494 C 325 509 357 510 438 510" fill="none" stroke="#a7b2bd" stroke-width="1.8" stroke-dasharray="5 5" stroke-linecap="round"/>
   <path d="M 95 510 C 135 510 154 507 174 490 C 191 475 198 454 218 452 C 243 450 257 480 274 496 C 293 508 338 510 438 510 L 95 510 Z" fill="#2b9697" fill-opacity="0.09"/>
@@ -47,5 +47,5 @@
   <text x="245" y="557" fill="#687684" font-family="Noto Sans, Arial, sans-serif" font-size="14">PPO target</text>
   <path d="M 345 553 H 369" fill="none" stroke="#2b9697" stroke-width="2.6"/>
   <text x="375" y="557" fill="#687684" font-family="Noto Sans, Arial, sans-serif" font-size="14">GRPO target</text>
-  <text x="240" y="584" text-anchor="middle" fill="#566474" font-family="Noto Sans, Arial, sans-serif" font-size="18">π<tspan baseline-shift="sub" font-size="12">target</tspan><tspan> (a | o) ∝ r</tspan><tspan baseline-shift="sub" font-size="12">rule</tspan><tspan> (o, a) π</tspan><tspan baseline-shift="sub" font-size="12">old</tspan><tspan> (a | o)</tspan></text>
+  <text x="240" y="584" text-anchor="middle" fill="#30343b" font-family="Cambria Math, Cambria, Times New Roman, serif" font-size="22" font-style="italic">π<tspan baseline-shift="sub" font-size="14" font-style="normal">target</tspan><tspan> (a | o) ∝ r</tspan><tspan baseline-shift="sub" font-size="14" font-style="normal">rule</tspan><tspan> (o, a) π</tspan><tspan baseline-shift="sub" font-size="14" font-style="normal">old</tspan><tspan> (a | o)</tspan></text>
 </svg>
