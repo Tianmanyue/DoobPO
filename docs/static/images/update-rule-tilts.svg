@@ -10,7 +10,7 @@
   <!-- Shared reference distribution. -->
   <rect x="40.5" y="78.5" width="307" height="192" rx="4" fill="#fff" stroke="#dce3ea"/>
   <text x="64" y="107" fill="#222b36" font-family="Noto Sans, Arial, sans-serif" font-size="20" font-weight="600">Reference policy</text>
-  <text x="64" y="126" fill="#687684" font-family="Noto Sans, Arial, sans-serif" font-size="18">π_old(a | o)</text>
+  <text x="64" y="126" fill="#687684" font-family="Noto Sans, Arial, sans-serif" font-size="18">π<tspan baseline-shift="sub" font-size="12">old</tspan><tspan> (a | o)</tspan></text>
   <path d="M 65 239 H 324" stroke="#b7c2cc" stroke-width="1"/>
   <path d="M 65 239 C 106 239 125 236 145 216 C 161 199 169 161 191 157 C 213 153 223 184 239 212 C 255 236 276 239 324 239 L 65 239 Z" fill="#eef1f4"/>
   <path d="M 65 239 C 106 239 125 236 145 216 C 161 199 169 161 191 157 C 213 153 223 184 239 212 C 255 236 276 239 324 239" fill="none" stroke="#677889" stroke-width="2.4" stroke-linecap="round"/>
@@ -21,8 +21,8 @@
   <circle cx="457" cy="174" r="3" fill="#9aa7b4"/>
   <path d="M 457 174 L 551 95" fill="none" stroke="#9aa7b4" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M 457 174 L 551 241" fill="none" stroke="#9aa7b4" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="365" y="130" fill="#3273dc" font-family="Noto Sans, Arial, sans-serif" font-size="18" font-weight="600">r_PPO &gt; 0</text>
-  <text x="365" y="232" fill="#2b9697" font-family="Noto Sans, Arial, sans-serif" font-size="18" font-weight="600">r_GRPO &gt; 0</text>
+  <text x="365" y="130" fill="#3273dc" font-family="Noto Sans, Arial, sans-serif" font-size="18" font-weight="600">r<tspan baseline-shift="sub" font-size="12">PPO</tspan><tspan> &gt; 0</tspan></text>
+  <text x="365" y="232" fill="#2b9697" font-family="Noto Sans, Arial, sans-serif" font-size="18" font-weight="600">r<tspan baseline-shift="sub" font-size="12">GRPO</tspan><tspan> &gt; 0</tspan></text>
 
   <!-- PPO: gray is the very same reference curve; blue is an illustrative tilt. -->
   <rect x="570.5" y="20.5" width="348" height="133" rx="4" fill="#fff" stroke="#dce3ea"/>
@@ -44,5 +44,5 @@
   <path d="M 594 278 C 629 278 645 275 661 260 C 677 243 682 223 703 221 C 725 219 740 247 756 262 C 776 277 810 278 895 278" fill="none" stroke="#2b9697" stroke-width="2.6" stroke-linecap="round"/>
   <text x="882" y="294" fill="#8793a0" font-family="Noto Sans, Arial, sans-serif" font-size="16">a</text>
 
-  <text x="480" y="329" text-anchor="middle" fill="#566474" font-family="Noto Sans, Arial, sans-serif" font-size="18">π_target(a | o) ∝ r_rule(o, a) π_old(a | o)</text>
+  <text x="480" y="327" text-anchor="middle" fill="#566474" font-family="Noto Sans, Arial, sans-serif" font-size="20">π<tspan baseline-shift="sub" font-size="13">target</tspan><tspan> (a | o) ∝ r</tspan><tspan baseline-shift="sub" font-size="13">rule</tspan><tspan> (o, a) π</tspan><tspan baseline-shift="sub" font-size="13">old</tspan><tspan> (a | o)</tspan></text>
 </svg>
